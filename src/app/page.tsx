@@ -38,7 +38,7 @@ export default function Home() {
           <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed font-medium fade-up" style={{ animationDelay: "0.25s" }}>
             覚悟の先に、本当の自分がいる。
             <br />
-            <span className="text-accent">その生きざまが、魂を揺さぶり、人の心を震わせる。</span>
+            その生きざまが、魂を揺さぶり、人の心を震わせる。
           </p>
           <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-muted fade-up" style={{ animationDelay: "0.35s" }}>
             壊れた身体、折れかけた心——それでも立ち上がった人間の記録。
