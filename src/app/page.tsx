@@ -5,34 +5,40 @@ export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative py-24 sm:py-32">
-        <div className="mx-auto max-w-3xl px-6 text-center">
-          <p className="text-sm font-medium tracking-[0.3em] text-muted uppercase">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Particles & Glow */}
+        <div className="particles" />
+        <div className="glow-orb glow-orb-red -top-32 -left-32" />
+        <div className="glow-orb glow-orb-blue -bottom-32 -right-32" />
+
+        <div className="relative mx-auto max-w-3xl px-6 text-center">
+          <p className="text-sm font-medium tracking-[0.3em] text-muted uppercase fade-up">
             復活アスリート図鑑
           </p>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
-            <span className="text-accent">RE:</span>BORN
+          <h1 className="mt-4 text-6xl font-bold tracking-tight sm:text-7xl lg:text-8xl fade-up" style={{ animationDelay: "0.1s" }}>
+            <span className="gradient-text">RE:BORN</span>
           </h1>
-          <p className="mt-2 text-lg text-muted">魂のアーカイブ</p>
-          <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-muted">
+          <p className="mt-2 text-xl text-muted fade-up" style={{ animationDelay: "0.2s" }}>魂のアーカイブ</p>
+          <p className="mx-auto mt-8 max-w-xl text-base leading-relaxed text-muted fade-up" style={{ animationDelay: "0.3s" }}>
             壊れた身体、折れかけた心——それでも立ち上がった人間の記録。
             <br />
             ここに収められた言葉と物語が、あなたの中の何かに届くことを願って。
           </p>
+          <div className="mx-auto mt-10 h-px w-32 bg-gradient-to-r from-transparent via-accent/40 to-transparent" />
         </div>
       </section>
 
       {/* Athlete List */}
-      <section className="border-t border-border">
+      <section className="relative">
         <div className="mx-auto max-w-3xl px-6 py-16">
-          <div className="space-y-16">
+          <div className="space-y-12">
             {athletes.map((athlete, index) => (
               <Link
                 key={athlete.id}
                 href={`/athletes/${athlete.id}`}
                 className="group block"
               >
-                <article>
+                <article className="glass-card rounded-xl p-6 transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
                   <p className="text-xs font-medium tracking-widest text-muted">
                     {String(index + 1).padStart(2, "0")}
                   </p>
@@ -85,10 +91,6 @@ export default function Home() {
                     この物語を読む →
                   </p>
                 </article>
-
-                {index < athletes.length - 1 && (
-                  <div className="mt-16 border-b border-border" />
-                )}
               </Link>
             ))}
           </div>

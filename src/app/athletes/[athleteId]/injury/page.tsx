@@ -79,17 +79,28 @@ export default function InjuryPage({
           <button
             key={injury.id}
             onClick={() => setSelectedInjury(selectedInjury?.id === injury.id ? null : injury)}
-            className={`flex w-full items-start gap-3 rounded-lg border p-4 text-left text-sm transition-all ${
+            className={`flex w-full items-start gap-3 glass-card rounded-lg p-4 text-left text-sm transition-all ${
               selectedInjury?.id === injury.id
                 ? "border-accent/40 bg-accent/5"
-                : "border-border hover:border-accent/20"
+                : "hover:border-accent/20"
             }`}
+            style={
+              selectedInjury?.id === injury.id
+                ? { boxShadow: "0 0 20px rgba(239, 68, 68, 0.15)" }
+                : undefined
+            }
           >
             <span
               className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
               style={{
                 backgroundColor:
                   injury.severity >= 9 ? "#ef4444" : injury.severity >= 7 ? "#f97316" : "#facc15",
+                boxShadow:
+                  injury.severity >= 9
+                    ? "0 0 8px rgba(239,68,68,0.5)"
+                    : injury.severity >= 7
+                    ? "0 0 8px rgba(249,115,22,0.5)"
+                    : "0 0 8px rgba(250,204,21,0.5)",
               }}
             />
             <div>

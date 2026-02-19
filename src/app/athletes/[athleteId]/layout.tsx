@@ -39,10 +39,12 @@ export default async function AthleteLayout({
       {/* Athlete Header */}
       <header className="mb-10">
         <p className="text-sm tracking-widest text-muted">{athlete.sport} / {athlete.nationality}</p>
-        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">{athlete.name}</h1>
+        <h1 className="mt-2 text-4xl font-bold sm:text-5xl" style={{ textShadow: "0 0 40px rgba(239, 68, 68, 0.15)" }}>
+          {athlete.name}
+        </h1>
         <p className="mt-1 text-lg text-muted">{athlete.name_en}</p>
 
-        <blockquote className="mt-6 border-l-2 border-accent/40 pl-4">
+        <blockquote className="mt-6 border-l-2 border-accent/40 pl-4" style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}>
           <p className="text-lg italic leading-relaxed">
             「{athlete.main_quote}」
           </p>
@@ -54,13 +56,13 @@ export default async function AthleteLayout({
         </blockquote>
       </header>
 
-      {/* Sub Nav */}
-      <nav className="mb-10 flex gap-1 overflow-x-auto border-b border-border">
+      {/* Sub Nav — pill style */}
+      <nav className="mb-10 flex gap-2 overflow-x-auto">
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className="whitespace-nowrap px-4 py-2.5 text-sm font-medium text-muted hover:text-foreground transition-colors"
+            className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
           >
             {item.label}
           </Link>

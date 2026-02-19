@@ -4,7 +4,9 @@ import { athletes } from "@/lib/mock-data";
 export default function AthletesPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className="text-3xl font-bold">選手一覧</h1>
+      <h1 className="text-3xl font-bold">
+        <span className="gradient-text">選手一覧</span>
+      </h1>
       <p className="mt-2 text-muted">収録アスリート</p>
 
       <div className="mt-10 space-y-12">
@@ -14,7 +16,7 @@ export default function AthletesPage() {
             href={`/athletes/${athlete.id}`}
             className="group block"
           >
-            <article className="rounded-xl border border-border p-6 transition-all group-hover:border-accent/40 group-hover:shadow-sm">
+            <article className="glass-card rounded-xl p-6 transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
               <p className="text-xs tracking-widest text-muted">
                 {String(index + 1).padStart(2, "0")}
               </p>

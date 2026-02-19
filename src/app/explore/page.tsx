@@ -34,7 +34,9 @@ export default function ExplorePage() {
 
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className="text-3xl font-bold">探索</h1>
+      <h1 className="text-3xl font-bold">
+        <span className="gradient-text">探索</span>
+      </h1>
       <p className="mt-2 text-muted">
         怪我の部位や種類から、同じ困難を乗り越えたアスリートを探す
       </p>
@@ -51,11 +53,16 @@ export default function ExplorePage() {
                   const first = regions[0];
                   setSelectedRegion(selectedRegion && regions.includes(selectedRegion) ? null : first);
                 }}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   selectedRegion && BODY_GROUPS[key].regions.includes(selectedRegion)
-                    ? "bg-accent text-white"
-                    : "bg-foreground/5 text-muted hover:bg-foreground/10"
+                    ? "text-white"
+                    : "glass-card text-muted hover:text-foreground"
                 }`}
+                style={
+                  selectedRegion && BODY_GROUPS[key].regions.includes(selectedRegion)
+                    ? { background: "linear-gradient(135deg, #ef4444, #f97316)" }
+                    : undefined
+                }
               >
                 {label}
               </button>
@@ -70,11 +77,16 @@ export default function ExplorePage() {
               <button
                 key={t.value}
                 onClick={() => setSelectedType(selectedType === t.value ? null : t.value)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                   selectedType === t.value
-                    ? "bg-accent text-white"
-                    : "bg-foreground/5 text-muted hover:bg-foreground/10"
+                    ? "text-white"
+                    : "glass-card text-muted hover:text-foreground"
                 }`}
+                style={
+                  selectedType === t.value
+                    ? { background: "linear-gradient(135deg, #ef4444, #f97316)" }
+                    : undefined
+                }
               >
                 {t.label}
               </button>
@@ -103,7 +115,7 @@ export default function ExplorePage() {
               <p className="text-sm text-muted">{results.length}件の結果</p>
               {results.map((r) => (
                 <Link key={r.id} href={`/athletes/${r.athletes.id}`} className="group block">
-                  <article className="rounded-xl border border-border p-5 transition-all group-hover:border-accent/40">
+                  <article className="glass-card rounded-xl p-5 transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
                     <h3 className="text-lg font-bold group-hover:text-accent transition-colors">
                       {r.athletes.name}
                       <span className="ml-2 text-sm font-normal text-muted">{r.athletes.name_en}</span>
@@ -115,6 +127,12 @@ export default function ExplorePage() {
                         style={{
                           backgroundColor:
                             r.severity >= 9 ? "#ef4444" : r.severity >= 7 ? "#f97316" : "#facc15",
+                          boxShadow:
+                            r.severity >= 9
+                              ? "0 0 8px rgba(239,68,68,0.5)"
+                              : r.severity >= 7
+                              ? "0 0 8px rgba(249,115,22,0.5)"
+                              : "0 0 8px rgba(250,204,21,0.5)",
                         }}
                       />
                       <div>

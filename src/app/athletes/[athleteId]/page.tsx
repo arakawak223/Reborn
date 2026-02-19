@@ -22,7 +22,7 @@ export default async function AthleteProfilePage({
   return (
     <div className="space-y-12">
       {/* Bio */}
-      <section>
+      <section className="glass-card rounded-xl p-6">
         <h2 className="text-xs font-medium tracking-widest text-muted uppercase">基本情報</h2>
         <dl className="mt-4 grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-2 sm:gap-x-8">
           <div>
@@ -45,7 +45,7 @@ export default async function AthleteProfilePage({
       </section>
 
       {/* Achievements */}
-      <section>
+      <section className="glass-card rounded-xl p-6">
         <h2 className="text-xs font-medium tracking-widest text-muted uppercase">主な功績</h2>
         <ul className="mt-4 space-y-1">
           {athlete.achievements.map((a, i) => (
@@ -58,7 +58,7 @@ export default async function AthleteProfilePage({
       </section>
 
       {/* Injury */}
-      <section>
+      <section className="glass-card rounded-xl p-6">
         <h2 className="text-xs font-medium tracking-widest text-muted uppercase">負傷の詳細</h2>
         <p className="mt-4 text-sm font-medium text-accent leading-relaxed">
           {athlete.injury_detail}
@@ -68,13 +68,19 @@ export default async function AthleteProfilePage({
             {injuries.map((inj) => (
               <div
                 key={inj.id}
-                className="flex items-start gap-3 rounded-lg border border-border p-3 text-sm"
+                className="flex items-start gap-3 glass-card rounded-lg p-3 text-sm"
               >
                 <span
                   className="mt-1 h-2.5 w-2.5 shrink-0 rounded-full"
                   style={{
                     backgroundColor:
                       inj.severity >= 9 ? "#ef4444" : inj.severity >= 7 ? "#f97316" : "#facc15",
+                    boxShadow:
+                      inj.severity >= 9
+                        ? "0 0 8px rgba(239,68,68,0.5)"
+                        : inj.severity >= 7
+                        ? "0 0 8px rgba(249,115,22,0.5)"
+                        : "0 0 8px rgba(250,204,21,0.5)",
                   }}
                 />
                 <div>
@@ -97,7 +103,8 @@ export default async function AthleteProfilePage({
             {quotes.map((q) => (
               <blockquote
                 key={q.id}
-                className="border-l-2 border-accent/30 pl-4"
+                className="glass-card rounded-lg p-4 border-l-2"
+                style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}
               >
                 <p className="text-sm italic leading-relaxed">
                   「{q.quote}」
@@ -121,7 +128,7 @@ export default async function AthleteProfilePage({
             {testimoniesList.map((t) => (
               <blockquote
                 key={t.id}
-                className="rounded-lg bg-foreground/[0.03] p-4"
+                className="glass-card rounded-lg p-4"
               >
                 <p className="text-sm italic leading-relaxed">
                   「{t.quote}」

@@ -89,9 +89,14 @@ export default function QuizPage({
         {allQuizzes.map((_, i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded-full ${
+            className={`h-1.5 flex-1 rounded-full ${
               i < currentIndex ? "bg-accent" : i === currentIndex ? "bg-accent/40" : "bg-foreground/10"
             }`}
+            style={
+              i < currentIndex
+                ? { background: "linear-gradient(90deg, #ef4444, #f97316)" }
+                : undefined
+            }
           />
         ))}
         <span className="ml-2 text-xs text-muted">
@@ -107,20 +112,23 @@ export default function QuizPage({
 
         <div className="mt-6 space-y-3">
           {question.choices.map((choice, i) => {
-            let borderClass = "border-border";
-            let bgClass = "";
+            let shadowStyle = {};
+            let borderClass = "border-[var(--glass-border)]";
+            let bgStyle = "var(--glass-bg)";
 
             if (revealed) {
               if (i === question.correct_index) {
                 borderClass = "border-green-500";
-                bgClass = "bg-green-500/5";
+                bgStyle = "rgba(34, 197, 94, 0.05)";
+                shadowStyle = { boxShadow: "0 0 20px rgba(34, 197, 94, 0.2)" };
               } else if (i === selectedAnswer) {
                 borderClass = "border-red-500";
-                bgClass = "bg-red-500/5";
+                bgStyle = "rgba(239, 68, 68, 0.05)";
+                shadowStyle = { boxShadow: "0 0 20px rgba(239, 68, 68, 0.2)" };
               }
             } else if (i === selectedAnswer) {
               borderClass = "border-accent";
-              bgClass = "bg-accent/5";
+              bgStyle = "rgba(239, 68, 68, 0.05)";
             }
 
             return (
@@ -128,9 +136,10 @@ export default function QuizPage({
                 key={i}
                 onClick={() => handleSelect(i)}
                 disabled={revealed}
-                className={`flex w-full items-center gap-3 rounded-lg border-2 p-4 text-left text-sm transition-all ${borderClass} ${bgClass} ${
+                className={`flex w-full items-center gap-3 rounded-lg border-2 p-4 text-left text-sm transition-all backdrop-blur-sm ${borderClass} ${
                   !revealed ? "hover:border-accent/40" : ""
                 } disabled:cursor-default`}
+                style={{ background: bgStyle, ...shadowStyle }}
               >
                 <span
                   className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
@@ -138,7 +147,7 @@ export default function QuizPage({
                       ? "bg-green-500 text-white"
                       : revealed && i === selectedAnswer
                       ? "bg-red-500 text-white"
-                      : "border border-border"
+                      : "border border-[var(--glass-border)]"
                   }`}
                 >
                   {LETTERS[i]}
@@ -153,13 +162,13 @@ export default function QuizPage({
       {/* Feedback */}
       {revealed && (
         <div className="mt-8 space-y-4">
-          <div className="rounded-lg border border-border p-4">
+          <div className="glass-card rounded-lg p-4">
             <p className="text-xs font-medium tracking-widest text-muted uppercase">解説</p>
             <p className="mt-2 text-sm leading-relaxed">
               {question.rationale}
             </p>
           </div>
-          <div className="rounded-lg bg-accent/5 p-4">
+          <div className="glass-card rounded-lg p-4 border-l-2 border-accent/40">
             <p className="text-sm italic leading-relaxed text-accent">
               {question.encouragement}
             </p>
