@@ -1,17 +1,30 @@
 import Link from "next/link";
 import { athletes } from "@/lib/mock-data";
+import { getSportImage } from "@/lib/sport-images";
 
 export default function Home() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Particles & Glow */}
-        <div className="particles" />
-        <div className="glow-orb glow-orb-red -top-32 -left-32" />
-        <div className="glow-orb glow-orb-blue -bottom-32 -right-32" />
+        {/* Background Video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-30"
+          style={{ zIndex: 0 }}
+        >
+          <source src="/Reborn/videos/hero-particles.mp4" type="video/mp4" />
+        </video>
 
-        <div className="relative mx-auto max-w-3xl px-6 text-center">
+        {/* Particles & Glow */}
+        <div className="particles" style={{ zIndex: 1 }} />
+        <div className="glow-orb glow-orb-red -top-32 -left-32" style={{ zIndex: 1 }} />
+        <div className="glow-orb glow-orb-blue -bottom-32 -right-32" style={{ zIndex: 1 }} />
+
+        <div className="relative mx-auto max-w-3xl px-6 text-center" style={{ zIndex: 2 }}>
           <p className="text-sm font-medium tracking-[0.3em] text-muted uppercase fade-up">
             復活アスリート図鑑
           </p>
@@ -39,16 +52,29 @@ export default function Home() {
                 className="group block"
               >
                 <article className="glass-card rounded-xl p-6 transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
-                  <p className="text-xs font-medium tracking-widest text-muted">
-                    {String(index + 1).padStart(2, "0")}
-                  </p>
+                  <div className="flex gap-5">
+                    {/* Sport Image */}
+                    <div className="hidden sm:block flex-shrink-0">
+                      <img
+                        src={getSportImage(athlete.sport)}
+                        alt=""
+                        className="w-20 h-14 rounded-lg object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                      />
+                    </div>
 
-                  <h2 className="mt-2 text-2xl font-bold group-hover:text-accent transition-colors">
-                    {athlete.name}
-                    <span className="ml-3 text-base font-normal text-muted">
-                      {athlete.name_en}
-                    </span>
-                  </h2>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium tracking-widest text-muted">
+                        {String(index + 1).padStart(2, "0")}
+                      </p>
+
+                      <h2 className="mt-2 text-2xl font-bold group-hover:text-accent transition-colors">
+                        {athlete.name}
+                        <span className="ml-3 text-base font-normal text-muted">
+                          {athlete.name_en}
+                        </span>
+                      </h2>
+                    </div>
+                  </div>
 
                   {/* Main Quote */}
                   <blockquote className="mt-4 border-l-2 border-accent/40 pl-4">

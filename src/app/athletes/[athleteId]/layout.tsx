@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { athletes, getAthleteById } from "@/lib/mock-data";
+import { getSportImage } from "@/lib/sport-images";
 
 export function generateStaticParams() {
   return athletes.map((a) => ({ athleteId: a.id }));
@@ -26,50 +27,64 @@ export default async function AthleteLayout({
     { href: `${basePath}/quiz`, label: "クイズ" },
   ];
 
+  const sportImageUrl = getSportImage(athlete.sport);
+
   return (
-    <div className="mx-auto max-w-3xl px-6 py-12">
-      {/* Back */}
-      <Link
-        href="/"
-        className="inline-block text-xs text-muted hover:text-foreground transition-colors mb-8"
-      >
-        ← 図鑑トップへ戻る
-      </Link>
+    <div className="relative mx-auto max-w-3xl px-6 py-12">
+      {/* Background Sport Image */}
+      <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 0 }}>
+        <img
+          src={sportImageUrl}
+          alt=""
+          className="h-full w-full object-cover opacity-[0.06]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--background)] via-[var(--background)]/90 to-[var(--background)]" />
+      </div>
 
-      {/* Athlete Header */}
-      <header className="mb-10">
-        <p className="text-sm tracking-widest text-muted">{athlete.sport} / {athlete.nationality}</p>
-        <h1 className="mt-2 text-4xl font-bold sm:text-5xl" style={{ textShadow: "0 0 40px rgba(239, 68, 68, 0.15)" }}>
-          {athlete.name}
-        </h1>
-        <p className="mt-1 text-lg text-muted">{athlete.name_en}</p>
+      <div className="relative" style={{ zIndex: 1 }}>
+        {/* Back */}
+        <Link
+          href="/"
+          className="inline-block text-xs text-muted hover:text-foreground transition-colors mb-8"
+        >
+          ← 図鑑トップへ戻る
+        </Link>
 
-        <blockquote className="mt-6 border-l-2 border-accent/40 pl-4" style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}>
-          <p className="text-lg italic leading-relaxed">
-            「{athlete.main_quote}」
-          </p>
-        </blockquote>
-        <blockquote className="mt-3 border-l-2 border-border pl-4">
-          <p className="text-sm italic leading-relaxed text-muted">
-            「{athlete.sub_quote}」
-          </p>
-        </blockquote>
-      </header>
+        {/* Athlete Header */}
+        <header className="mb-10">
+          <p className="text-sm tracking-widest text-muted">{athlete.sport} / {athlete.nationality}</p>
+          <h1 className="mt-2 text-4xl font-bold sm:text-5xl" style={{ textShadow: "0 0 40px rgba(239, 68, 68, 0.15)" }}>
+            {athlete.name}
+          </h1>
+          <p className="mt-1 text-lg text-muted">{athlete.name_en}</p>
 
-      {/* Sub Nav — pill style */}
-      <nav className="mb-10 flex gap-2 overflow-x-auto">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+          <blockquote className="mt-6 border-l-2 border-accent/40 pl-4" style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}>
+            <p className="text-lg italic leading-relaxed">
+              「{athlete.main_quote}」
+            </p>
+          </blockquote>
+          <blockquote className="mt-3 border-l-2 border-border pl-4">
+            <p className="text-sm italic leading-relaxed text-muted">
+              「{athlete.sub_quote}」
+            </p>
+          </blockquote>
+        </header>
 
-      {children}
+        {/* Sub Nav — pill style */}
+        <nav className="mb-10 flex gap-2 overflow-x-auto">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {children}
+      </div>
     </div>
   );
 }
