@@ -36,9 +36,9 @@ export default async function AthleteLayout({
         <img
           src={sportImageUrl}
           alt=""
-          className="h-full w-full object-cover opacity-[0.06]"
+          className="h-full w-full object-cover opacity-[0.15]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--background)] via-[var(--background)]/90 to-[var(--background)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--background)]/80 via-[var(--background)]/85 to-[var(--background)]" />
       </div>
 
       <div className="relative" style={{ zIndex: 1 }}>

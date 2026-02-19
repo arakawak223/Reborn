@@ -19,13 +19,13 @@ export default function AthletesPage() {
           >
             <article className="glass-card relative rounded-xl p-6 overflow-hidden transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
               {/* Background Sport Image */}
-              <div className="absolute right-0 top-0 h-full w-1/3 overflow-hidden">
+              <div className="absolute right-0 top-0 h-full w-2/5 overflow-hidden">
                 <img
                   src={getSportImage(athlete.sport)}
                   alt=""
-                  className="h-full w-full object-cover opacity-[0.12] group-hover:opacity-[0.2] transition-opacity duration-500"
+                  className="h-full w-full object-cover opacity-25 group-hover:opacity-40 transition-opacity duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--card)] via-[var(--card)]/80 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-r from-[var(--card)] via-[var(--card)]/60 to-transparent" />
               </div>
 
               {/* Content */}

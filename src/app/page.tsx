@@ -8,16 +8,19 @@ export default function Home() {
       {/* Hero */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Video */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-30"
-          style={{ zIndex: 0 }}
-        >
-          <source src="/Reborn/videos/hero-particles.mp4" type="video/mp4" />
-        </video>
+        <div className="absolute inset-0" style={{ zIndex: 0 }}>
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="h-full w-full object-cover"
+          >
+            <source src="/Reborn/videos/hero-particles.mp4" type="video/mp4" />
+          </video>
+          {/* 赤みのあるカラーオーバーレイ — 動画を暗く＋赤アクセント */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-red-950/30 to-black/60" />
+        </div>
 
         {/* Particles & Glow */}
         <div className="particles" style={{ zIndex: 1 }} />
@@ -52,13 +55,13 @@ export default function Home() {
                 className="group block"
               >
                 <article className="glass-card rounded-xl p-6 transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
-                  <div className="flex gap-5">
+                  <div className="flex gap-5 items-start">
                     {/* Sport Image */}
-                    <div className="hidden sm:block flex-shrink-0">
+                    <div className="flex-shrink-0">
                       <img
                         src={getSportImage(athlete.sport)}
                         alt=""
-                        className="w-20 h-14 rounded-lg object-cover opacity-70 group-hover:opacity-100 transition-opacity"
+                        className="w-24 h-16 sm:w-28 sm:h-20 rounded-lg object-cover opacity-80 group-hover:opacity-100 transition-opacity shadow-lg shadow-black/30"
                       />
                     </div>
 
