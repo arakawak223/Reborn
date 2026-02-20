@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { athletes, getAthleteById } from "@/lib/mock-data";
 import { getSportImage } from "@/lib/sport-images";
+import BackButton from "@/components/layout/BackButton";
 
 export function generateStaticParams() {
   return athletes.map((a) => ({ athleteId: a.id }));
@@ -43,12 +44,16 @@ export default async function AthleteLayout({
 
       <div className="relative" style={{ zIndex: 1 }}>
         {/* Back */}
-        <Link
-          href="/"
-          className="inline-block text-xs text-muted hover:text-foreground transition-colors mb-8"
-        >
-          ← 図鑑トップへ戻る
-        </Link>
+        <div className="flex items-center gap-4 mb-8">
+          <BackButton />
+          <span className="text-xs text-muted/40">|</span>
+          <Link
+            href="/"
+            className="inline-block text-xs text-muted hover:text-foreground transition-colors"
+          >
+            ← 図鑑トップへ戻る
+          </Link>
+        </div>
 
         {/* Athlete Header */}
         <header className="mb-10">
