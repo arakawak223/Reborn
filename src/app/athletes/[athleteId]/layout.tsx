@@ -22,10 +22,10 @@ export default async function AthleteLayout({
 
   const basePath = `/athletes/${athleteId}`;
   const navItems = [
-    { href: basePath, label: "プロフィール" },
-    { href: `${basePath}/story`, label: "物語" },
-    { href: `${basePath}/injury`, label: "怪我マップ" },
-    { href: `${basePath}/quiz`, label: "クイズ" },
+    { href: basePath, label: "プロフィール", highlight: false },
+    { href: `${basePath}/story`, label: "物語", highlight: true },
+    { href: `${basePath}/injury`, label: "怪我マップ", highlight: false },
+    { href: `${basePath}/quiz`, label: "クイズ", highlight: false },
   ];
 
   const sportImageUrl = getSportImage(athlete.sport);
@@ -81,7 +81,11 @@ export default async function AthleteLayout({
             <Link
               key={item.href}
               href={item.href}
-              className="whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-foreground/5 hover:text-foreground"
+              className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                item.highlight
+                  ? "nav-story-highlight hover:brightness-110"
+                  : "text-muted hover:bg-foreground/5 hover:text-foreground"
+              }`}
             >
               {item.label}
             </Link>
