@@ -3380,9 +3380,9 @@ export const athleteInjuries: InjuryRecord[] = [
   { id: "inj-001", athlete_id: "mcmorris", body_region: "chest", injury_type: "rupture", diagnosis: "肺破裂", severity: 10, recovery_months: 9, year_occurred: 2017, description: "木に激突し肺が破裂", is_primary: true },
   { id: "inj-002", athlete_id: "mcmorris", body_region: "abdomen", injury_type: "rupture", diagnosis: "脾臓破裂", severity: 10, recovery_months: 9, year_occurred: 2017, description: "内臓破裂で緊急手術", is_primary: true },
   { id: "inj-003", athlete_id: "mcmorris", body_region: "hip_left", injury_type: "fracture", diagnosis: "骨盤骨折", severity: 9, recovery_months: 9, year_occurred: 2017, description: "全身17箇所の骨折のうちの一つ", is_primary: false },
-  { id: "inj-004", athlete_id: "mcmorris", body_region: "lower_back", injury_type: "fracture", diagnosis: "肋骨多発骨折", severity: 8, recovery_months: 9, year_occurred: 2017, description: "複数の肋骨が折れた", is_primary: false },
+  { id: "inj-004", athlete_id: "mcmorris", body_region: "ribcage", injury_type: "fracture", diagnosis: "肋骨多発骨折", severity: 8, recovery_months: 9, year_occurred: 2017, description: "複数の肋骨が折れた", is_primary: false },
   { id: "inj-005", athlete_id: "mcmorris", body_region: "upper_arm_left", injury_type: "fracture", diagnosis: "左腕骨折", severity: 7, recovery_months: 6, year_occurred: 2017, description: "左腕を骨折", is_primary: false },
-  { id: "inj-006", athlete_id: "mcmorris", body_region: "head", injury_type: "fracture", diagnosis: "顎骨折", severity: 7, recovery_months: 4, year_occurred: 2017, description: "顎を骨折", is_primary: false },
+  { id: "inj-006", athlete_id: "mcmorris", body_region: "jaw", injury_type: "fracture", diagnosis: "顎骨折", severity: 7, recovery_months: 4, year_occurred: 2017, description: "顎を骨折", is_primary: false },
   // Hirano
   { id: "inj-007", athlete_id: "hirano", body_region: "abdomen", injury_type: "rupture", diagnosis: "肝臓損傷", severity: 9, recovery_months: 6, year_occurred: 2017, description: "転倒により肝臓を損傷。命に関わる怪我", is_primary: true },
   { id: "inj-008", athlete_id: "hirano", body_region: "knee_left", injury_type: "tear", diagnosis: "左膝靭帯損傷", severity: 7, recovery_months: 6, year_occurred: 2017, description: "肝臓損傷と同時に発生", is_primary: true },
@@ -3482,7 +3482,7 @@ export const athleteInjuries: InjuryRecord[] = [
   // Endo
   { id: "inj-070", athlete_id: "endo", body_region: "head", injury_type: "other", diagnosis: "脳震盪", severity: 7, recovery_months: 1, year_occurred: 2022, description: "W杯直前の脳震盪。出場が危ぶまれる事態に", is_primary: true },
 // Ueno
-  { id: "inj-069", athlete_id: "ueno", body_region: "head", injury_type: "fracture", diagnosis: "顎の複雑骨折", severity: 9, recovery_months: 10, year_occurred: 2019, description: "試合中にライナーが顔面を直撃。顎を複雑骨折し、口をワイヤーで固定", is_primary: true },
+  { id: "inj-069", athlete_id: "ueno", body_region: "jaw", injury_type: "fracture", diagnosis: "顎の複雑骨折", severity: 9, recovery_months: 10, year_occurred: 2019, description: "試合中にライナーが顔面を直撃。顎を複雑骨折し、口をワイヤーで固定", is_primary: true },
   { id: "inj-070", athlete_id: "ueno", body_region: "shoulder_right", injury_type: "other", diagnosis: "右肩の慢性的な疲労", severity: 5, recovery_months: 3, year_occurred: 2015, description: "長年の投球による右肩の消耗", is_primary: false },
   // Nishikori
   { id: "inj-071", athlete_id: "nishikori", body_region: "hand_right", injury_type: "tear", diagnosis: "右手首靭帯損傷", severity: 8, recovery_months: 6, year_occurred: 2017, description: "手首の靭帯損傷で長期離脱", is_primary: true },

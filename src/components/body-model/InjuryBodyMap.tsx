@@ -20,78 +20,106 @@ const VIEW_CONFIG: Record<ViewMode, { label: string; src: string }> = {
  * Injury marker positions as percentage of the musculoskeletal image (791×1342).
  * Each region maps to { x%, y% } on the image.
  */
+/**
+ * Calibrated against muscular-front.png (791×1342px).
+ * Measured pixel positions converted to percentages.
+ */
 const REGION_POS_MUSCLE: Record<string, { x: number; y: number }> = {
-  head:             { x: 50,  y: 5 },
-  jaw:              { x: 50,  y: 8 },
-  eye_left:         { x: 47,  y: 4 },
-  eye_right:        { x: 53,  y: 4 },
-  neck:             { x: 50,  y: 12 },
-  shoulder_left:    { x: 32,  y: 17 },
-  shoulder_right:   { x: 68,  y: 17 },
-  upper_arm_left:   { x: 24,  y: 24 },
-  upper_arm_right:  { x: 76,  y: 24 },
-  elbow_left:       { x: 19,  y: 32 },
-  elbow_right:      { x: 81,  y: 32 },
-  forearm_left:     { x: 15,  y: 39 },
-  forearm_right:    { x: 85,  y: 39 },
-  wrist_left:       { x: 11,  y: 46 },
-  wrist_right:      { x: 89,  y: 46 },
-  hand_left:        { x: 8,   y: 51 },
-  hand_right:       { x: 92,  y: 51 },
-  chest:            { x: 50,  y: 24 },
-  ribcage:          { x: 50,  y: 27 },
-  upper_back:       { x: 50,  y: 26 },
-  abdomen:          { x: 50,  y: 36 },
-  spine:            { x: 50,  y: 32 },
-  lower_back:       { x: 50,  y: 40 },
-  pelvis:           { x: 50,  y: 44 },
-  hip_left:         { x: 40,  y: 46 },
-  hip_right:        { x: 60,  y: 46 },
-  thigh_left:       { x: 39,  y: 56 },
-  thigh_right:      { x: 61,  y: 56 },
-  knee_left:        { x: 39,  y: 65 },
-  knee_right:       { x: 61,  y: 65 },
-  shin_left:        { x: 39,  y: 73 },
-  shin_right:       { x: 61,  y: 73 },
-  calf_left:        { x: 39,  y: 75 },
-  calf_right:       { x: 61,  y: 75 },
-  ankle_left:       { x: 39,  y: 84 },
-  ankle_right:      { x: 61,  y: 84 },
-  foot_left:        { x: 39,  y: 90 },
-  foot_right:       { x: 61,  y: 90 },
+  // Head & face
+  head:             { x: 50,  y: 3.5 },  // top of skull
+  jaw:              { x: 50,  y: 8.5 },  // chin/jaw line
+  eye_left:         { x: 47,  y: 3.5 },
+  eye_right:        { x: 53,  y: 3.5 },
+  // Neck
+  neck:             { x: 50,  y: 11.5 },
+  // Shoulders
+  shoulder_left:    { x: 28,  y: 16 },
+  shoulder_right:   { x: 72,  y: 16 },
+  // Upper arms
+  upper_arm_left:   { x: 22,  y: 23 },
+  upper_arm_right:  { x: 78,  y: 23 },
+  // Elbows
+  elbow_left:       { x: 17,  y: 31 },
+  elbow_right:      { x: 83,  y: 31 },
+  // Forearms
+  forearm_left:     { x: 13,  y: 38 },
+  forearm_right:    { x: 87,  y: 38 },
+  // Wrists
+  wrist_left:       { x: 9,   y: 44 },
+  wrist_right:      { x: 91,  y: 44 },
+  // Hands
+  hand_left:        { x: 6,   y: 50 },
+  hand_right:       { x: 94,  y: 50 },
+  // Torso
+  chest:            { x: 50,  y: 22 },   // lung/chest level (between nipples)
+  ribcage:          { x: 44,  y: 28 },   // bottom of rib cage, slightly left
+  upper_back:       { x: 50,  y: 24 },
+  abdomen:          { x: 50,  y: 35 },   // navel area
+  spine:            { x: 50,  y: 30 },
+  lower_back:       { x: 50,  y: 38 },
+  // Pelvis & hips
+  pelvis:           { x: 50,  y: 42 },
+  hip_left:         { x: 40,  y: 44 },
+  hip_right:        { x: 60,  y: 44 },
+  // Upper legs
+  thigh_left:       { x: 38,  y: 55 },
+  thigh_right:      { x: 62,  y: 55 },
+  // Knees
+  knee_left:        { x: 38,  y: 64 },
+  knee_right:       { x: 62,  y: 64 },
+  // Lower legs
+  shin_left:        { x: 38,  y: 73 },
+  shin_right:       { x: 62,  y: 73 },
+  calf_left:        { x: 38,  y: 75 },
+  calf_right:       { x: 62,  y: 75 },
+  // Ankles
+  ankle_left:       { x: 38,  y: 84 },
+  ankle_right:      { x: 62,  y: 84 },
+  // Feet
+  foot_left:        { x: 38,  y: 92 },
+  foot_right:       { x: 62,  y: 92 },
 };
 
 /**
  * Organ view positions (organs-front.png is upper-body focused, 3029×2693).
  * Adjusted for the different image proportions.
  */
+/**
+ * Calibrated against organs-front.png (3029×2693px).
+ * Image has "Internal organs" title at top (~4%), body from ~6% to ~95%.
+ * Upper-body focused — legs only partially visible.
+ */
 const REGION_POS_ORGANS: Record<string, { x: number; y: number }> = {
-  head:             { x: 50,  y: 5 },
-  jaw:              { x: 50,  y: 10 },
-  eye_left:         { x: 46,  y: 3 },
-  eye_right:        { x: 54,  y: 3 },
-  neck:             { x: 50,  y: 17 },
-  shoulder_left:    { x: 30,  y: 25 },
-  shoulder_right:   { x: 70,  y: 25 },
-  chest:            { x: 50,  y: 33 },
-  ribcage:          { x: 50,  y: 38 },
-  upper_back:       { x: 50,  y: 35 },
-  abdomen:          { x: 50,  y: 52 },
-  spine:            { x: 50,  y: 45 },
-  lower_back:       { x: 50,  y: 58 },
+  head:             { x: 50,  y: 7 },
+  jaw:              { x: 50,  y: 13 },
+  eye_left:         { x: 47,  y: 7 },
+  eye_right:        { x: 53,  y: 7 },
+  neck:             { x: 50,  y: 18 },
+  shoulder_left:    { x: 32,  y: 24 },
+  shoulder_right:   { x: 68,  y: 24 },
+  chest:            { x: 50,  y: 32 },   // lungs & heart area
+  ribcage:          { x: 44,  y: 38 },
+  upper_back:       { x: 50,  y: 34 },
+  abdomen:          { x: 50,  y: 50 },   // stomach / spleen level
+  spine:            { x: 50,  y: 44 },
+  lower_back:       { x: 50,  y: 56 },
   pelvis:           { x: 50,  y: 68 },
-  hip_left:         { x: 38,  y: 72 },
-  hip_right:        { x: 62,  y: 72 },
-  upper_arm_left:   { x: 20,  y: 35 },
-  upper_arm_right:  { x: 80,  y: 35 },
-  elbow_left:       { x: 14,  y: 48 },
-  elbow_right:      { x: 86,  y: 48 },
-  forearm_left:     { x: 10,  y: 58 },
-  forearm_right:    { x: 90,  y: 58 },
+  hip_left:         { x: 40,  y: 70 },
+  hip_right:        { x: 60,  y: 70 },
+  upper_arm_left:   { x: 22,  y: 34 },
+  upper_arm_right:  { x: 78,  y: 34 },
+  elbow_left:       { x: 16,  y: 46 },
+  elbow_right:      { x: 84,  y: 46 },
+  forearm_left:     { x: 12,  y: 56 },
+  forearm_right:    { x: 88,  y: 56 },
+  wrist_left:       { x: 9,   y: 64 },
+  wrist_right:      { x: 91,  y: 64 },
+  hand_left:        { x: 7,   y: 70 },
+  hand_right:       { x: 93,  y: 70 },
   thigh_left:       { x: 40,  y: 82 },
   thigh_right:      { x: 60,  y: 82 },
-  knee_left:        { x: 40,  y: 92 },
-  knee_right:       { x: 60,  y: 92 },
+  knee_left:        { x: 40,  y: 94 },
+  knee_right:       { x: 60,  y: 94 },
 };
 
 function getSeverityInfo(severity: number) {
