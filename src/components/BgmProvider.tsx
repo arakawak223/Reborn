@@ -1,173 +1,156 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getBgmForPath } from "@/lib/bgm-config";
 
-const FADE_DURATION = 1200; // ms
+const FADE_MS = 1000;
 const VOLUME = 0.35;
+const FADE_STEPS = 20;
+
+function fadeVolume(
+  audio: HTMLAudioElement,
+  from: number,
+  to: number,
+  onDone?: () => void
+) {
+  let step = 0;
+  const delta = (to - from) / FADE_STEPS;
+  const interval = setInterval(() => {
+    step++;
+    audio.volume = Math.min(1, Math.max(0, from + delta * step));
+    if (step >= FADE_STEPS) {
+      clearInterval(interval);
+      onDone?.();
+    }
+  }, FADE_MS / FADE_STEPS);
+  return interval;
+}
 
 export default function BgmProvider() {
   const pathname = usePathname();
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
-  const currentSrcRef = useRef<string>("");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const srcRef = useRef("");
+  const mutedRef = useRef(false);
   const [muted, setMuted] = useState(false);
-  const [started, setStarted] = useState(false);
-  const fadingRef = useRef(false);
+  const [playing, setPlaying] = useState(false);
 
-  // Fade out an audio element and clean up
-  const fadeOut = useCallback((audio: HTMLAudioElement) => {
-    const startVol = audio.volume;
-    const steps = 20;
-    const stepTime = FADE_DURATION / steps;
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      audio.volume = Math.max(0, startVol * (1 - step / steps));
-      if (step >= steps) {
-        clearInterval(interval);
+  // Keep ref in sync with state
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
+
+  // Core: start playing a specific src
+  const startTrack = (src: string) => {
+    const audio = new Audio(src);
+    audio.loop = true;
+    audio.volume = mutedRef.current ? 0 : VOLUME;
+    audioRef.current = audio;
+    srcRef.current = src;
+
+    audio
+      .play()
+      .then(() => setPlaying(true))
+      .catch(() => {
+        // Autoplay blocked — will be started by user click
+      });
+  };
+
+  // Switch to a new track with crossfade
+  const switchTrack = (newSrc: string) => {
+    const old = audioRef.current;
+
+    if (old) {
+      const oldVol = old.volume;
+      fadeVolume(old, oldVol, 0, () => {
+        old.pause();
+        old.src = "";
+      });
+    }
+
+    const audio = new Audio(newSrc);
+    audio.loop = true;
+    audio.volume = 0;
+    audioRef.current = audio;
+    srcRef.current = newSrc;
+
+    audio
+      .play()
+      .then(() => {
+        fadeVolume(audio, 0, mutedRef.current ? 0 : VOLUME);
+        setPlaying(true);
+      })
+      .catch(() => {});
+  };
+
+  // On mount: try autoplay
+  useEffect(() => {
+    const src = getBgmForPath(pathname);
+    startTrack(src);
+
+    return () => {
+      // Cleanup on unmount
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.src = "";
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // On pathname change: switch BGM
+  useEffect(() => {
+    const newSrc = getBgmForPath(pathname);
+    if (newSrc === srcRef.current) return;
+    switchTrack(newSrc);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
+
+  // Toggle mute/unmute — also handles first play after autoplay block
+  const handleToggle = () => {
+    const audio = audioRef.current;
+
+    if (!audio || audio.paused) {
+      // Audio doesn't exist or isn't playing (autoplay was blocked)
+      // Start fresh on this user interaction
+      if (audio) {
         audio.pause();
         audio.src = "";
-        audio.load();
       }
-    }, stepTime);
-  }, []);
-
-  // Fade in an audio element
-  const fadeIn = useCallback((audio: HTMLAudioElement, targetVol: number) => {
-    audio.volume = 0;
-    const steps = 20;
-    const stepTime = FADE_DURATION / steps;
-    let step = 0;
-    const interval = setInterval(() => {
-      step++;
-      audio.volume = Math.min(targetVol, targetVol * (step / steps));
-      if (step >= steps) {
-        clearInterval(interval);
-        fadingRef.current = false;
-      }
-    }, stepTime);
-  }, []);
-
-  // Start or switch BGM based on pathname
-  const playBgm = useCallback(
-    (targetSrc: string) => {
-      if (fadingRef.current) return;
-
-      // Already playing this track
-      if (currentSrcRef.current === targetSrc && currentAudioRef.current) {
-        return;
-      }
-
-      fadingRef.current = true;
-
-      // Fade out old track
-      if (currentAudioRef.current) {
-        fadeOut(currentAudioRef.current);
-      }
-
-      // Create and play new track
-      const newAudio = new Audio(targetSrc);
+      const src = getBgmForPath(pathname);
+      const newAudio = new Audio(src);
       newAudio.loop = true;
-      newAudio.volume = 0;
-      currentAudioRef.current = newAudio;
-      currentSrcRef.current = targetSrc;
-
+      newAudio.volume = VOLUME;
+      audioRef.current = newAudio;
+      srcRef.current = src;
       newAudio
         .play()
         .then(() => {
-          fadeIn(newAudio, muted ? 0 : VOLUME);
+          setPlaying(true);
+          setMuted(false);
         })
-        .catch(() => {
-          // Autoplay blocked — will try again on user interaction
-          fadingRef.current = false;
-        });
-    },
-    [fadeOut, fadeIn, muted]
-  );
-
-  // Try autoplay on mount and on first user interaction
-  useEffect(() => {
-    const targetSrc = getBgmForPath(pathname);
-
-    if (!started) {
-      // Try autoplay first
-      const audio = new Audio(targetSrc);
-      audio.loop = true;
-      audio.volume = VOLUME;
-      const playPromise = audio.play();
-
-      if (playPromise) {
-        playPromise
-          .then(() => {
-            currentAudioRef.current = audio;
-            currentSrcRef.current = targetSrc;
-            setStarted(true);
-          })
-          .catch(() => {
-            // Autoplay blocked — wait for user interaction
-            audio.pause();
-            audio.src = "";
-
-            const startOnInteraction = () => {
-              document.removeEventListener("click", startOnInteraction);
-              document.removeEventListener("touchstart", startOnInteraction);
-              document.removeEventListener("keydown", startOnInteraction);
-              setStarted(true);
-            };
-            document.addEventListener("click", startOnInteraction);
-            document.addEventListener("touchstart", startOnInteraction);
-            document.addEventListener("keydown", startOnInteraction);
-          });
-      }
-
+        .catch(() => {});
       return;
     }
 
-    playBgm(targetSrc);
-  }, [pathname, started, playBgm]);
-
-  // When started becomes true from user interaction, start playing
-  useEffect(() => {
-    if (started && !currentAudioRef.current) {
-      const targetSrc = getBgmForPath(pathname);
-      const audio = new Audio(targetSrc);
-      audio.loop = true;
-      audio.volume = muted ? 0 : VOLUME;
-      audio.play().catch(() => {});
-      currentAudioRef.current = audio;
-      currentSrcRef.current = targetSrc;
+    // Audio is playing — toggle mute
+    if (muted) {
+      audio.volume = VOLUME;
+      setMuted(false);
+    } else {
+      audio.volume = 0;
+      setMuted(true);
     }
-  }, [started, pathname, muted]);
-
-  // Handle mute/unmute
-  const toggleMute = useCallback(() => {
-    setMuted((prev) => {
-      const next = !prev;
-      if (currentAudioRef.current) {
-        if (next) {
-          currentAudioRef.current.volume = 0;
-        } else {
-          currentAudioRef.current.volume = VOLUME;
-          // If not started yet, start on this interaction
-          if (!started) {
-            setStarted(true);
-          }
-        }
-      }
-      return next;
-    });
-  }, [started]);
+  };
 
   return (
     <button
-      onClick={toggleMute}
-      aria-label={muted ? "BGMをオンにする" : "BGMをオフにする"}
-      title={muted ? "BGMをオンにする" : "BGMをオフにする"}
+      onClick={handleToggle}
+      aria-label={muted || !playing ? "BGMをオンにする" : "BGMをオフにする"}
+      title={muted || !playing ? "BGMをオンにする" : "BGMをオフにする"}
       className="fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-white/10 backdrop-blur-sm border border-white/20 text-white/70 hover:text-white hover:bg-white/20 transition-all duration-200 shadow-lg"
     >
-      {muted ? (
-        // Muted icon
+      {muted || !playing ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
@@ -184,7 +167,6 @@ export default function BgmProvider() {
           <line x1="17" y1="9" x2="23" y2="15" />
         </svg>
       ) : (
-        // Playing icon
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"
