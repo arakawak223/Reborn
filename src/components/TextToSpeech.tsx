@@ -310,7 +310,7 @@ export default function TextToSpeech({
         currentIndexRef.current = index + 1;
         // Add pauses between segments for natural breathing
         // Long dash (——) gets a dramatic pause, ellipsis also long
-        const pauseMs = seg.hasDash ? 700 : seg.hasEllipsis ? 600 : seg.isQuote ? 200 : 150;
+        const pauseMs = seg.hasDash ? 700 : seg.hasEllipsis ? 600 : 100;
         setTimeout(() => speakSegment(segments, index + 1), pauseMs);
       };
 
