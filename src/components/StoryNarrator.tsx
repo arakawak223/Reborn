@@ -17,12 +17,17 @@ interface StoryNarratorProps {
 
 /** Per-chapter read-aloud button */
 export function ChapterNarrator({ chapter }: StoryNarratorProps) {
+  const stage = (["origin", "despair", "void", "awakening", "rebirth"].includes(chapter.stage)
+    ? chapter.stage
+    : null) as "origin" | "despair" | "void" | "awakening" | "rebirth" | null;
+
   return (
     <TextToSpeech
       text={`${chapter.title}。\n${chapter.body}`}
       label="この章を読み上げ"
       mode="emotional"
       compact={false}
+      stage={stage}
     />
   );
 }

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type TTSMode = "normal" | "emotional";
+type StoryStage = "origin" | "despair" | "void" | "awakening" | "rebirth" | null;
 
 interface TextToSpeechProps {
   /** Text to read aloud */
@@ -13,6 +14,8 @@ interface TextToSpeechProps {
   mode?: TTSMode;
   /** Compact button style (icon only) */
   compact?: boolean;
+  /** Story stage for stage-aware intonation */
+  stage?: StoryStage;
 }
 
 // Preferred Japanese voices (ranked by quality)
@@ -38,13 +41,176 @@ function findBestJapaneseVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisV
   return voices.find((v) => v.lang.startsWith("ja")) ?? null;
 }
 
-/** Split text into segments for emotional reading */
-function splitIntoSegments(text: string): { text: string; isQuote: boolean }[] {
+// --- Emotion detection ---
+
+type Emotion = "neutral" | "sorrow" | "triumph" | "tension" | "quiet" | "warm";
+
+const EMOTION_KEYWORDS: { emotion: Emotion; words: string[] }[] = [
+  {
+    emotion: "sorrow",
+    words: [
+      "絶望", "苦痛", "涙", "挫折", "崩れ", "失", "悲", "痛み", "暗闇",
+      "苦し", "泣", "地獄", "恐怖", "不安", "孤独", "断裂", "破壊", "終わり",
+      "もう駄目", "全治", "手術", "引退", "離脱", "重傷",
+    ],
+  },
+  {
+    emotion: "triumph",
+    words: [
+      "復活", "勝利", "栄光", "奇跡", "歓喜", "達成", "優勝", "金メダル",
+      "復帰", "成し遂げ", "超え", "打ち勝", "再び", "戻って", "輝",
+      "歓声", "世界一", "記録", "証明", "信じ",
+    ],
+  },
+  {
+    emotion: "tension",
+    words: [
+      "決断", "覚悟", "運命", "賭け", "瀬戸際", "限界", "挑", "闘",
+      "立ち上が", "必死", "命がけ", "ギリギリ", "最後の", "一か八か",
+    ],
+  },
+  {
+    emotion: "quiet",
+    words: [
+      "静か", "空白", "無", "沈黙", "ただ", "一人", "じっと", "長い",
+      "見つめ", "待", "耐え", "日々", "繰り返",
+    ],
+  },
+  {
+    emotion: "warm",
+    words: [
+      "支え", "仲間", "家族", "感謝", "愛", "絆", "恩", "共に",
+      "寄り添", "励まし", "信頼", "笑顔",
+    ],
+  },
+];
+
+/** Stage-level base tone adjustments */
+const STAGE_TONE: Record<string, { pitchBase: number; rateBase: number }> = {
+  origin:    { pitchBase: 1.02, rateBase: 0.97 },
+  despair:   { pitchBase: 0.88, rateBase: 0.88 },
+  void:      { pitchBase: 0.92, rateBase: 0.85 },
+  awakening: { pitchBase: 1.05, rateBase: 0.95 },
+  rebirth:   { pitchBase: 1.10, rateBase: 1.0 },
+};
+
+interface Segment {
+  text: string;
+  isQuote: boolean;
+  emotion: Emotion;
+  hasExclamation: boolean;
+  hasQuestion: boolean;
+  hasEllipsis: boolean;
+}
+
+function detectEmotion(text: string): Emotion {
+  let best: Emotion = "neutral";
+  let bestCount = 0;
+  for (const { emotion, words } of EMOTION_KEYWORDS) {
+    const count = words.filter((w) => text.includes(w)).length;
+    if (count > bestCount) {
+      bestCount = count;
+      best = emotion;
+    }
+  }
+  return best;
+}
+
+/** Split text into sentence-level segments with emotion metadata */
+function splitIntoSegments(text: string): Segment[] {
+  // First split by paragraphs, then by sentences
   const paragraphs = text.split(/\n+/).filter((p) => p.trim());
-  return paragraphs.map((p) => ({
-    text: p.trim(),
-    isQuote: p.startsWith("「") || p.startsWith("『") || p.startsWith("\""),
-  }));
+  const segments: Segment[] = [];
+
+  for (const para of paragraphs) {
+    const trimmed = para.trim();
+    const isQuote = trimmed.startsWith("「") || trimmed.startsWith("『") || trimmed.startsWith("\"");
+
+    // Split paragraph into sentences (by 。！？ but keep the delimiter)
+    const sentences = trimmed
+      .split(/(?<=[。！？…」』])/g)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    // If splitting produced nothing, use the whole paragraph
+    const parts = sentences.length > 0 ? sentences : [trimmed];
+
+    for (const sentence of parts) {
+      segments.push({
+        text: sentence,
+        isQuote,
+        emotion: detectEmotion(sentence),
+        hasExclamation: /！|!/.test(sentence),
+        hasQuestion: /？|\?/.test(sentence),
+        hasEllipsis: /…|\.\.\./.test(sentence),
+      });
+    }
+  }
+
+  return segments;
+}
+
+/** Calculate pitch and rate for a segment based on emotion + context */
+function getVoiceParams(
+  seg: Segment,
+  stage: StoryStage,
+  baseRate: number,
+): { pitch: number; rate: number } {
+  // Start with stage-level tone
+  const stageTone = stage && STAGE_TONE[stage]
+    ? STAGE_TONE[stage]
+    : { pitchBase: 1.0, rateBase: 1.0 };
+
+  let pitch = stageTone.pitchBase;
+  let rate = baseRate * stageTone.rateBase;
+
+  // Emotion adjustments (layered on top of stage)
+  switch (seg.emotion) {
+    case "sorrow":
+      pitch *= 0.90;
+      rate *= 0.85;
+      break;
+    case "triumph":
+      pitch *= 1.12;
+      rate *= 1.05;
+      break;
+    case "tension":
+      pitch *= 1.05;
+      rate *= 0.92;
+      break;
+    case "quiet":
+      pitch *= 0.95;
+      rate *= 0.82;
+      break;
+    case "warm":
+      pitch *= 1.06;
+      rate *= 0.93;
+      break;
+  }
+
+  // Quote: slightly slower, more expressive
+  if (seg.isQuote) {
+    pitch *= 1.08;
+    rate *= 0.90;
+  }
+
+  // Punctuation adjustments
+  if (seg.hasExclamation) {
+    pitch *= 1.10;
+    rate *= 1.05;
+  }
+  if (seg.hasQuestion) {
+    pitch *= 1.08;
+  }
+  if (seg.hasEllipsis) {
+    rate *= 0.80;
+  }
+
+  // Clamp to Web Speech API limits
+  pitch = Math.max(0.1, Math.min(2.0, pitch));
+  rate = Math.max(0.1, Math.min(10.0, rate));
+
+  return { pitch, rate };
 }
 
 export default function TextToSpeech({
@@ -52,6 +218,7 @@ export default function TextToSpeech({
   label = "読み上げ",
   mode = "emotional",
   compact = false,
+  stage = null,
 }: TextToSpeechProps) {
   const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
   const [rate, setRate] = useState(1.0);
@@ -92,7 +259,7 @@ export default function TextToSpeech({
   }, []);
 
   const speakSegment = useCallback(
-    (segments: { text: string; isQuote: boolean }[], index: number) => {
+    (segments: Segment[], index: number) => {
       if (index >= segments.length) {
         setStatus("idle");
         setShowControls(false);
@@ -108,10 +275,10 @@ export default function TextToSpeech({
       }
       utterance.lang = "ja-JP";
 
-      // Emotional reading adjustments
-      if (mode === "emotional" && seg.isQuote) {
-        utterance.rate = rateRef.current * 0.88;
-        utterance.pitch = 1.15;
+      if (mode === "emotional") {
+        const params = getVoiceParams(seg, stage, rateRef.current);
+        utterance.pitch = params.pitch;
+        utterance.rate = params.rate;
       } else {
         utterance.rate = rateRef.current;
         utterance.pitch = 1.0;
@@ -119,19 +286,20 @@ export default function TextToSpeech({
 
       utterance.onend = () => {
         currentIndexRef.current = index + 1;
-        speakSegment(segments, index + 1);
+        // Add a brief pause between segments for natural breathing
+        const pauseMs = seg.hasEllipsis ? 600 : seg.isQuote ? 400 : 150;
+        setTimeout(() => speakSegment(segments, index + 1), pauseMs);
       };
 
       utterance.onerror = (e) => {
         if (e.error !== "interrupted" && e.error !== "canceled") {
           console.warn("TTS error:", e.error);
         }
-        // Don't auto-advance on error
       };
 
       speechSynthesis.speak(utterance);
     },
-    [mode]
+    [mode, stage]
   );
 
   const handlePlay = useCallback(() => {
