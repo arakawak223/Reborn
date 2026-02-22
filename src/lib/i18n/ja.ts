@@ -1,0 +1,205 @@
+const ja = {
+  // Metadata
+  meta: {
+    title: "RE:BORN \u2014 \u5fa9\u6d3b\u30a2\u30b9\u30ea\u30fc\u30c8\u56f3\u9451 \u2014 \u9b42\u306e\u30a2\u30fc\u30ab\u30a4\u30d6",
+    description:
+      "\u58ee\u7d76\u306a\u602a\u6211\u3092\u4e57\u308a\u8d8a\u3048\u5fa9\u6d3b\u3092\u9042\u3052\u305f\u30a2\u30b9\u30ea\u30fc\u30c8\u305f\u3061\u306e\u7269\u8a9e\u3092\u3001\u56f3\u9451\u5f62\u5f0f\u3067\u7d10\u89e3\u304fWeb\u30a2\u30d7\u30ea\u30b1\u30fc\u30b7\u30e7\u30f3",
+  },
+
+  // Header
+  header: {
+    subtitle: "\u5fa9\u6d3b\u30a2\u30b9\u30ea\u30fc\u30c8\u56f3\u9451 \u2014 \u9b42\u306e\u30a2\u30fc\u30ab\u30a4\u30d6",
+    athletes: "\u9078\u624b\u4e00\u89a7",
+    explore: "\u63a2\u7d22",
+  },
+
+  // Footer
+  footer: {
+    subtitle: "\u5fa9\u6d3b\u30a2\u30b9\u30ea\u30fc\u30c8\u56f3\u9451 \u2014 \u9b42\u306e\u30a2\u30fc\u30ab\u30a4\u30d6",
+    description: "\u58ee\u7d76\u306a\u602a\u6211\u3092\u4e57\u308a\u8d8a\u3048\u5fa9\u6d3b\u3092\u9042\u3052\u305f\u30a2\u30b9\u30ea\u30fc\u30c8\u305f\u3061\u306e\u7269\u8a9e",
+  },
+
+  // Home page
+  home: {
+    tagline: "\u5fa9\u6d3b\u30a2\u30b9\u30ea\u30fc\u30c8\u56f3\u9451",
+    subtitle: "\u9b42\u306e\u30a2\u30fc\u30ab\u30a4\u30d6",
+    heroLine1: "\u899a\u609f\u306e\u5148\u306b\u3001\u672c\u5f53\u306e\u81ea\u5206\u304c\u3044\u308b\u3002",
+    heroLine2: "\u305d\u306e\u751f\u304d\u3056\u307e\u304c\u3001\u9b42\u3092\u63fa\u3055\u3076\u308a\u3001\u4eba\u306e\u5fc3\u3092\u9707\u308f\u305b\u308b\u3002",
+    heroLine3: "\u58ca\u308c\u305f\u8eab\u4f53\u3001\u6298\u308c\u304b\u3051\u305f\u5fc3\u2014\u2014\u305d\u308c\u3067\u3082\u7acb\u3061\u4e0a\u304c\u3063\u305f\u4eba\u9593\u306e\u8a18\u9332\u3002",
+    heroLine4:
+      "\u3053\u3053\u306b\u53ce\u3081\u3089\u308c\u305f\u8a00\u8449\u3068\u7269\u8a9e\u304c\u3001\u3042\u306a\u305f\u306e\u4e2d\u306e\u4f55\u304b\u306b\u5c4a\u304f\u3053\u3068\u3092\u9858\u3063\u3066\u3002",
+    nationality: "\u56fd\u7c4d",
+    birthplace: "\u51fa\u8eab\u5730",
+    sport: "\u7af6\u6280",
+    birthDate: "\u751f\u5e74\u6708\u65e5",
+    age: "\u6b73",
+    achievements: "\u4e3b\u306a\u529f\u7e3e",
+    injuryDetail: "\u8ca0\u50b7\u306e\u8a73\u7d30",
+    readStory: "\u3053\u306e\u7269\u8a9e\u3092\u8aad\u3080 \u2192",
+  },
+
+  // Athletes list page
+  athletesList: {
+    title: "\u9078\u624b\u4e00\u89a7",
+    subtitle: "\u53ce\u9332\u30a2\u30b9\u30ea\u30fc\u30c8",
+  },
+
+  // Athlete layout
+  athleteLayout: {
+    backToTop: "\u2190 \u56f3\u9451\u30c8\u30c3\u30d7\u3078\u623b\u308b",
+    profile: "\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb",
+    story: "\u7269\u8a9e",
+    injuryMap: "\u602a\u6211\u30de\u30c3\u30d7",
+    quiz: "\u30af\u30a4\u30ba",
+  },
+
+  // Athlete profile page
+  profile: {
+    basicInfo: "\u57fa\u672c\u60c5\u5831",
+    nationality: "\u56fd\u7c4d",
+    birthplace: "\u51fa\u8eab\u5730",
+    birthDateAge: "\u751f\u5e74\u6708\u65e5\u30fb\u5e74\u9f62",
+    family: "\u5bb6\u65cf\u69cb\u6210",
+    achievements: "\u4e3b\u306a\u529f\u7e3e",
+    injuryDetail: "\u8ca0\u50b7\u306e\u8a73\u7d30",
+    injuryNarrate: "\u602a\u6211\u60c5\u5831\u3092\u8aad\u307f\u4e0a\u3052",
+    goldenQuotes: "\u91d1\u8a00",
+    testimonies: "\u5468\u56f2\u306e\u8a3c\u8a00",
+    year: "\u5e74",
+    recoveryMonths: "\u56de\u5fa9{n}\u30f6\u6708",
+  },
+
+  // Story page
+  story: {
+    title: "\u5fa9\u6d3b\u306e\u7269\u8a9e",
+    subtitle: "5\u3064\u306e\u7ae0\u3067\u7d10\u89e3\u304f\u3001{name}\u306e\u5fa9\u6d3b\u5287",
+    narrateAll: "\u5168\u7ae0\u3092\u901a\u3057\u3066\u8aad\u307f\u4e0a\u3052",
+    narrateChapter: "\u3053\u306e\u7ae0\u3092\u8aad\u307f\u4e0a\u3052",
+    fullNarrationPrefix: "{name}\u306e\u5fa9\u6d3b\u306e\u7269\u8a9e\u3002",
+    stageOrigin: "\u6839\u6e90",
+    stageDespair: "\u7d76\u671b",
+    stageVoid: "\u7a7a\u767d",
+    stageAwakening: "\u899a\u9192",
+    stageRebirth: "\u518d\u8a95",
+  },
+
+  // Injury page
+  injury: {
+    title: "\u602a\u6211\u30de\u30c3\u30d7",
+    description:
+      "\u4eba\u4f53\u30b7\u30eb\u30a8\u30c3\u30c8\u4e0a\u3067\u602a\u6211\u306e\u90e8\u4f4d\u3068\u91cd\u75c7\u5ea6\u3092\u78ba\u8a8d\u3067\u304d\u307e\u3059\u3002\u30de\u30fc\u30ab\u30fc\u3084\u30ab\u30fc\u30c9\u3092\u30af\u30ea\u30c3\u30af\u3059\u308b\u3068\u8a73\u7d30\u304c\u8868\u793a\u3055\u308c\u307e\u3059\u3002",
+    loading: "\u8aad\u307f\u8fbc\u307f\u4e2d...",
+    noData: "\u602a\u6211\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093",
+    musculoskeletal: "\u7b4b\u8089\u30fb\u9aa8\u683c",
+    organs: "\u5185\u81d3",
+    injuryList: "\u602a\u6211\u4e00\u89a7\uff08{n}\u4ef6\uff09",
+    severe: "\u91cd\u75c7",
+    moderate: "\u4e2d\u5ea6",
+    mild: "\u8efd\u5ea6",
+    primary: "\u4e3b\u50b7",
+    year: "\u5e74",
+    recovery: "\u56de\u5fa9 {n}\u30f6\u6708",
+    anatomyAlt: "\u4eba\u4f53\u89e3\u5256\u56f3\uff08{view}\uff09",
+  },
+
+  // Quiz page
+  quiz: {
+    coffeeBreak: "\u30b3\u30fc\u30d2\u30fc\u30d6\u30ec\u30a4\u30af\u30fb\u30af\u30a4\u30ba",
+    serious: "\u672c\u683c\u5206\u6790\u30af\u30a4\u30ba",
+    noData: "\u30af\u30a4\u30ba\u30c7\u30fc\u30bf\u304c\u3042\u308a\u307e\u305b\u3093",
+    correct: "\u6b63\u89e3",
+    perfectMessage: "{name}\u306e\u5fa9\u6d3b\u5287\u3092\u6df1\u304f\u7406\u89e3\u3057\u3066\u3044\u307e\u3059\uff01",
+    retryMessage: "\u3082\u3046\u4e00\u5ea6\u7269\u8a9e\u3092\u8aad\u3093\u3067\u3001\u518d\u6311\u6226\u3057\u3066\u307f\u307e\u3057\u3087\u3046\u3002",
+    retry: "\u3082\u3046\u4e00\u5ea6",
+    explanation: "\u89e3\u8aac",
+    next: "\u6b21\u306e\u554f\u984c\u3078",
+    showResults: "\u7d50\u679c\u3092\u898b\u308b",
+  },
+
+  // Explore page
+  explore: {
+    title: "\u63a2\u7d22",
+    description: "\u602a\u6211\u306e\u90e8\u4f4d\u3084\u7a2e\u985e\u304b\u3089\u3001\u540c\u3058\u56f0\u96e3\u3092\u4e57\u308a\u8d8a\u3048\u305f\u30a2\u30b9\u30ea\u30fc\u30c8\u3092\u63a2\u3059",
+    bodyRegion: "\u602a\u6211\u306e\u90e8\u4f4d",
+    headNeck: "\u982d\u30fb\u9996",
+    upperBody: "\u4e0a\u534a\u8eab",
+    lowerBody: "\u4e0b\u534a\u8eab",
+    injuryType: "\u602a\u6211\u306e\u7a2e\u985e",
+    fracture: "\u9aa8\u6298",
+    tear: "\u65ad\u88c2",
+    rupture: "\u7834\u88c2",
+    sprain: "\u634b\u632f",
+    other: "\u305d\u306e\u4ed6",
+    search: "\u691c\u7d22\u3059\u308b",
+    noResults: "\u6761\u4ef6\u306b\u4e00\u81f4\u3059\u308b\u30a2\u30b9\u30ea\u30fc\u30c8\u304c\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f",
+    resultCount: "{n}\u4ef6\u306e\u7d50\u679c",
+  },
+
+  // TextToSpeech
+  tts: {
+    readAloud: "\u8aad\u307f\u4e0a\u3052",
+    pause: "\u4e00\u6642\u505c\u6b62",
+    resume: "\u518d\u958b",
+    stop: "\u505c\u6b62",
+    speaking: "\u8aad\u307f\u4e0a\u3052\u4e2d",
+  },
+
+  // BackButton
+  back: {
+    label: "\u2190 1\u3064\u524d\u306b\u623b\u308b",
+  },
+
+  // BgmProvider
+  bgm: {
+    on: "BGM\u3092\u30aa\u30f3\u306b\u3059\u308b",
+    off: "BGM\u3092\u30aa\u30d5\u306b\u3059\u308b",
+  },
+
+  // Loading
+  loading: "\u8aad\u307f\u8fbc\u307f\u4e2d...",
+
+  // Body region labels
+  bodyRegions: {
+    head: "\u982d\u90e8",
+    neck: "\u9996",
+    shoulder_left: "\u5de6\u80a9",
+    shoulder_right: "\u53f3\u80a9",
+    upper_arm_left: "\u5de6\u4e0a\u8155",
+    upper_arm_right: "\u53f3\u4e0a\u8155",
+    elbow_left: "\u5de6\u8098",
+    elbow_right: "\u53f3\u8098",
+    forearm_left: "\u5de6\u524d\u8155",
+    forearm_right: "\u53f3\u524d\u8155",
+    wrist_left: "\u5de6\u624b\u9996",
+    wrist_right: "\u53f3\u624b\u9996",
+    hand_left: "\u5de6\u624b",
+    hand_right: "\u53f3\u624b",
+    chest: "\u80f8\u90e8",
+    ribcage: "\u808b\u9aa8",
+    upper_back: "\u4e0a\u80cc\u90e8",
+    lower_back: "\u8170\u90e8",
+    abdomen: "\u8179\u90e8",
+    spine: "\u810a\u690e",
+    pelvis: "\u9aa8\u76e4",
+    hip_left: "\u5de6\u80a1\u95a2\u7bc0",
+    hip_right: "\u53f3\u80a1\u95a2\u7bc0",
+    thigh_left: "\u5de6\u592a\u3082\u3082",
+    thigh_right: "\u53f3\u592a\u3082\u3082",
+    knee_left: "\u5de6\u819d",
+    knee_right: "\u53f3\u819d",
+    shin_left: "\u5de6\u8131",
+    shin_right: "\u53f3\u8131",
+    calf_left: "\u5de6\u3075\u304f\u3089\u306f\u304e",
+    calf_right: "\u53f3\u3075\u304f\u3089\u306f\u304e",
+    ankle_left: "\u5de6\u8db3\u9996",
+    ankle_right: "\u53f3\u8db3\u9996",
+    foot_left: "\u5de6\u8db3",
+    foot_right: "\u53f3\u8db3",
+    jaw: "\u984e",
+    eye_left: "\u5de6\u773c",
+    eye_right: "\u53f3\u773c",
+  },
+};
+
+export type Dictionary = typeof ja;
+export default ja;

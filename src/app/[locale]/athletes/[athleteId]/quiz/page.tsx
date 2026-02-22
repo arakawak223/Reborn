@@ -1,17 +1,21 @@
 "use client";
 
 import { use, useState, useCallback } from "react";
-import { getQuizzesByAthleteId, getAthleteById } from "@/lib/mock-data";
+import { getQuizzesByAthleteId, getAthleteById } from "@/lib/data";
+import { useLocale } from "@/lib/locale-context";
+import { getDictionary } from "@/lib/i18n";
 import type { QuizQuestion } from "@/lib/mock-data";
 
 export default function QuizPage({
   params,
 }: {
-  params: Promise<{ athleteId: string }>;
+  params: Promise<{ locale: string; athleteId: string }>;
 }) {
   const { athleteId } = use(params);
-  const athlete = getAthleteById(athleteId);
-  const allQuizzes = getQuizzesByAthleteId(athleteId);
+  const locale = useLocale();
+  const dict = getDictionary(locale);
+  const athlete = getAthleteById(athleteId, locale);
+  const allQuizzes = getQuizzesByAthleteId(athleteId, locale);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -44,19 +48,19 @@ export default function QuizPage({
   }, [currentIndex, allQuizzes.length]);
 
   if (allQuizzes.length === 0) {
-    return <p className="py-8 text-center text-sm text-muted">クイズデータがありません</p>;
+    return <p className="py-8 text-center text-sm text-muted">{dict.quiz.noData}</p>;
   }
 
   if (finished) {
     return (
       <div className="py-12 text-center">
         <p className="text-2xl font-bold">
-          {correctCount}/{allQuizzes.length} 正解
+          {correctCount}/{allQuizzes.length} {dict.quiz.correct}
         </p>
         <p className="mt-4 text-sm text-muted">
           {correctCount === allQuizzes.length
-            ? `${athlete?.name ?? "この選手"}の復活劇を深く理解しています！`
-            : "もう一度物語を読んで、再挑戦してみましょう。"}
+            ? dict.quiz.perfectMessage.replace("{name}", athlete?.name ?? "")
+            : dict.quiz.retryMessage}
         </p>
         <button
           onClick={() => {
@@ -68,7 +72,7 @@ export default function QuizPage({
           }}
           className="mt-6 rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
         >
-          もう一度
+          {dict.quiz.retry}
         </button>
       </div>
     );
@@ -81,7 +85,7 @@ export default function QuizPage({
   return (
     <div>
       <h2 className="text-xs font-medium tracking-widest text-muted uppercase">
-        {question.quiz_type === "coffee_break" ? "コーヒーブレイク・クイズ" : "本格分析クイズ"}
+        {question.quiz_type === "coffee_break" ? dict.quiz.coffeeBreak : dict.quiz.serious}
       </h2>
 
       {/* Progress */}
@@ -163,7 +167,7 @@ export default function QuizPage({
       {revealed && (
         <div className="mt-8 space-y-4">
           <div className="glass-card rounded-lg p-4">
-            <p className="text-xs font-medium tracking-widest text-muted uppercase">解説</p>
+            <p className="text-xs font-medium tracking-widest text-muted uppercase">{dict.quiz.explanation}</p>
             <p className="mt-2 text-sm leading-relaxed">
               {question.rationale}
             </p>
@@ -177,7 +181,7 @@ export default function QuizPage({
             onClick={handleNext}
             className="rounded-lg bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent/90 transition-colors"
           >
-            {currentIndex + 1 >= allQuizzes.length ? "結果を見る" : "次の問題へ"}
+            {currentIndex + 1 >= allQuizzes.length ? dict.quiz.showResults : dict.quiz.next}
           </button>
         </div>
       )}

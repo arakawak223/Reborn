@@ -40,8 +40,8 @@ ATHLETE_IDS.forEach((id, i) => {
  * Returns the audio file path, or null if no BGM should play.
  */
 export function getBgmForPath(pathname: string): string {
-  // Strip basePath prefix if present
-  const path = pathname.replace(/^\/Reborn/, "") || "/";
+  // Strip basePath prefix and locale prefix if present
+  const path = pathname.replace(/^\/Reborn/, "").replace(/^\/(ja|en)/, "") || "/";
 
   // Athlete pages: /athletes/{id} or /athletes/{id}/story etc.
   const match = path.match(/^\/athletes\/([^/]+)/);

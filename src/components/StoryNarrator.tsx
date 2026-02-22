@@ -1,6 +1,8 @@
 "use client";
 
 import TextToSpeech from "./TextToSpeech";
+import type { Locale } from "@/lib/locale-context";
+import { getDictionary } from "@/lib/i18n";
 
 interface Chapter {
   id: string;
@@ -11,23 +13,26 @@ interface Chapter {
 }
 
 interface StoryNarratorProps {
-  /** Read a single chapter */
   chapter: Chapter;
+  locale?: Locale;
 }
 
-/** Per-chapter read-aloud button */
-export function ChapterNarrator({ chapter }: StoryNarratorProps) {
+export function ChapterNarrator({ chapter, locale = "ja" }: StoryNarratorProps) {
+  const dict = getDictionary(locale);
   const stage = (["origin", "despair", "void", "awakening", "rebirth"].includes(chapter.stage)
     ? chapter.stage
     : null) as "origin" | "despair" | "void" | "awakening" | "rebirth" | null;
 
+  const sep = locale === "en" ? ".\n" : "\u3002\n";
+
   return (
     <TextToSpeech
-      text={`${chapter.title}。\n${chapter.body}`}
-      label="この章を読み上げ"
+      text={`${chapter.title}${sep}${chapter.body}`}
+      label={dict.story.narrateChapter}
       mode="emotional"
       compact={false}
       stage={stage}
+      locale={locale}
     />
   );
 }
@@ -35,19 +40,25 @@ export function ChapterNarrator({ chapter }: StoryNarratorProps) {
 interface FullStoryNarratorProps {
   chapters: Chapter[];
   athleteName: string;
+  locale?: Locale;
 }
 
-/** Full story narration button */
-export function FullStoryNarrator({ chapters, athleteName }: FullStoryNarratorProps) {
+export function FullStoryNarrator({ chapters, athleteName, locale = "ja" }: FullStoryNarratorProps) {
+  const dict = getDictionary(locale);
+  const sep = locale === "en" ? ".\n" : "\u3002\n";
+
   const fullText = chapters
-    .map((ch) => `${ch.title}。\n${ch.body}`)
+    .map((ch) => `${ch.title}${sep}${ch.body}`)
     .join("\n\n");
+
+  const prefix = dict.story.fullNarrationPrefix.replace("{name}", athleteName);
 
   return (
     <TextToSpeech
-      text={`${athleteName}の復活の物語。\n\n${fullText}`}
-      label="全章を通して読み上げ"
+      text={`${prefix}\n\n${fullText}`}
+      label={dict.story.narrateAll}
       mode="emotional"
+      locale={locale}
     />
   );
 }

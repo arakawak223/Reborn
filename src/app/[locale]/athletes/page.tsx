@@ -1,20 +1,32 @@
 import Link from "next/link";
-import { athletes } from "@/lib/mock-data";
+import { getAthletes } from "@/lib/data";
 import { getSportImage } from "@/lib/sport-images";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/locale-context";
 
-export default function AthletesPage() {
+export default async function AthletesPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  const loc = (locale === "en" ? "en" : "ja") as Locale;
+  const dict = getDictionary(loc);
+  const athletes = getAthletes(loc);
+  const isJa = loc === "ja";
+
   return (
     <div className="mx-auto max-w-3xl px-6 py-12">
       <h1 className="text-3xl font-bold">
-        <span className="gradient-text">選手一覧</span>
+        <span className="gradient-text">{dict.athletesList.title}</span>
       </h1>
-      <p className="mt-2 text-muted">収録アスリート</p>
+      <p className="mt-2 text-muted">{dict.athletesList.subtitle}</p>
 
       <div className="mt-10 space-y-12">
         {athletes.map((athlete, index) => (
           <Link
             key={athlete.id}
-            href={`/athletes/${athlete.id}`}
+            href={`/${loc}/athletes/${athlete.id}`}
             className="group block"
           >
             <article className="glass-card relative rounded-xl p-6 overflow-hidden transition-all duration-300 hover:border-accent/30 hover:shadow-[0_0_30px_rgba(239,68,68,0.08)]">
@@ -40,7 +52,7 @@ export default function AthletesPage() {
                   </span>
                 </h2>
                 <p className="mt-2 text-sm italic text-muted">
-                  「{athlete.main_quote}」
+                  {isJa ? `\u300c${athlete.main_quote}\u300d` : `"${athlete.main_quote}"`}
                 </p>
                 <p className="mt-3 text-sm">
                   {athlete.sport} / {athlete.nationality}

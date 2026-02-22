@@ -1,11 +1,18 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { athletes, getAthleteById } from "@/lib/mock-data";
+import { getAthletes, getAthleteById } from "@/lib/data";
 import { getSportImage } from "@/lib/sport-images";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/locale-context";
 import BackButton from "@/components/layout/BackButton";
 
 export function generateStaticParams() {
-  return athletes.map((a) => ({ athleteId: a.id }));
+  // Use Japanese data for the canonical list of athlete IDs
+  const jaAthletes = require("@/lib/mock-data").athletes;
+  const locales = ["ja", "en"];
+  return locales.flatMap((locale) =>
+    jaAthletes.map((a: { id: string }) => ({ locale, athleteId: a.id }))
+  );
 }
 
 export default async function AthleteLayout({
@@ -13,19 +20,22 @@ export default async function AthleteLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: Promise<{ athleteId: string }>;
+  params: Promise<{ locale: string; athleteId: string }>;
 }) {
-  const { athleteId } = await params;
-  const athlete = getAthleteById(athleteId);
+  const { locale, athleteId } = await params;
+  const loc = (locale === "en" ? "en" : "ja") as Locale;
+  const dict = getDictionary(loc);
+  const athlete = getAthleteById(athleteId, loc);
+  const isJa = loc === "ja";
 
   if (!athlete) return notFound();
 
-  const basePath = `/athletes/${athleteId}`;
+  const basePath = `/${loc}/athletes/${athleteId}`;
   const navItems = [
-    { href: basePath, label: "プロフィール", highlight: false },
-    { href: `${basePath}/story`, label: "物語", highlight: true },
-    { href: `${basePath}/injury`, label: "怪我マップ", highlight: false },
-    { href: `${basePath}/quiz`, label: "クイズ", highlight: false },
+    { href: basePath, label: dict.athleteLayout.profile, highlight: false },
+    { href: `${basePath}/story`, label: dict.athleteLayout.story, highlight: true },
+    { href: `${basePath}/injury`, label: dict.athleteLayout.injuryMap, highlight: false },
+    { href: `${basePath}/quiz`, label: dict.athleteLayout.quiz, highlight: false },
   ];
 
   const sportImageUrl = getSportImage(athlete.sport);
@@ -45,13 +55,13 @@ export default async function AthleteLayout({
       <div className="relative" style={{ zIndex: 1 }}>
         {/* Back */}
         <div className="flex items-center gap-4 mb-8">
-          <BackButton />
+          <BackButton locale={loc} />
           <span className="text-xs text-muted/40">|</span>
           <Link
-            href="/"
+            href={`/${loc}`}
             className="inline-block text-xs text-muted hover:text-foreground transition-colors"
           >
-            ← 図鑑トップへ戻る
+            {dict.athleteLayout.backToTop}
           </Link>
         </div>
 
@@ -65,17 +75,17 @@ export default async function AthleteLayout({
 
           <blockquote className="mt-6 border-l-2 border-accent/40 pl-4" style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}>
             <p className="text-lg italic leading-relaxed">
-              「{athlete.main_quote}」
+              {isJa ? `\u300c${athlete.main_quote}\u300d` : `"${athlete.main_quote}"`}
             </p>
           </blockquote>
           <blockquote className="mt-3 border-l-2 border-border pl-4">
             <p className="text-sm italic leading-relaxed text-muted">
-              「{athlete.sub_quote}」
+              {isJa ? `\u300c${athlete.sub_quote}\u300d` : `"${athlete.sub_quote}"`}
             </p>
           </blockquote>
         </header>
 
-        {/* Sub Nav — pill style */}
+        {/* Sub Nav */}
         <nav className="mb-10 flex gap-2 overflow-x-auto">
           {navItems.map((item) => (
             <Link

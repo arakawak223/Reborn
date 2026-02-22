@@ -2,153 +2,81 @@
 
 import { useState } from "react";
 import type { InjuryRecord } from "@/lib/mock-data";
+import type { Locale } from "@/lib/locale-context";
+import { getDictionary } from "@/lib/i18n";
 
 type ViewMode = "musculoskeletal" | "organs";
 
-const VIEW_CONFIG: Record<ViewMode, { label: string; src: string }> = {
-  musculoskeletal: {
-    label: "筋肉・骨格",
-    src: "/Reborn/images/anatomy/muscular-front.png",
-  },
-  organs: {
-    label: "内臓",
-    src: "/Reborn/images/anatomy/organs-front.png",
-  },
-};
-
-/**
- * Injury marker positions as percentage of the musculoskeletal image (791×1342).
- * Each region maps to { x%, y% } on the image.
- */
-/**
- * Calibrated against muscular-front.png (791×1342px).
- * Measured pixel positions converted to percentages.
- */
 const REGION_POS_MUSCLE: Record<string, { x: number; y: number }> = {
-  // Head & face
-  head:             { x: 50,  y: 3.5 },  // top of skull
-  jaw:              { x: 50,  y: 8.5 },  // chin/jaw line
-  eye_left:         { x: 47,  y: 3.5 },
-  eye_right:        { x: 53,  y: 3.5 },
-  // Neck
-  neck:             { x: 50,  y: 11.5 },
-  // Shoulders
-  shoulder_left:    { x: 28,  y: 16 },
-  shoulder_right:   { x: 72,  y: 16 },
-  // Upper arms
-  upper_arm_left:   { x: 22,  y: 23 },
-  upper_arm_right:  { x: 78,  y: 23 },
-  // Elbows
-  elbow_left:       { x: 17,  y: 31 },
-  elbow_right:      { x: 83,  y: 31 },
-  // Forearms
-  forearm_left:     { x: 13,  y: 38 },
-  forearm_right:    { x: 87,  y: 38 },
-  // Wrists
-  wrist_left:       { x: 9,   y: 44 },
-  wrist_right:      { x: 91,  y: 44 },
-  // Hands
-  hand_left:        { x: 6,   y: 50 },
-  hand_right:       { x: 94,  y: 50 },
-  // Torso
-  chest:            { x: 50,  y: 22 },   // lung/chest level (between nipples)
-  ribcage:          { x: 44,  y: 28 },   // bottom of rib cage, slightly left
-  upper_back:       { x: 50,  y: 24 },
-  abdomen:          { x: 50,  y: 35 },   // navel area
-  spine:            { x: 50,  y: 30 },
-  lower_back:       { x: 50,  y: 38 },
-  // Pelvis & hips
-  pelvis:           { x: 50,  y: 42 },
-  hip_left:         { x: 40,  y: 44 },
-  hip_right:        { x: 60,  y: 44 },
-  // Upper legs
-  thigh_left:       { x: 38,  y: 55 },
-  thigh_right:      { x: 62,  y: 55 },
-  // Knees
-  knee_left:        { x: 38,  y: 64 },
-  knee_right:       { x: 62,  y: 64 },
-  // Lower legs
-  shin_left:        { x: 38,  y: 73 },
-  shin_right:       { x: 62,  y: 73 },
-  calf_left:        { x: 38,  y: 75 },
-  calf_right:       { x: 62,  y: 75 },
-  // Ankles
-  ankle_left:       { x: 38,  y: 84 },
-  ankle_right:      { x: 62,  y: 84 },
-  // Feet
-  foot_left:        { x: 38,  y: 92 },
-  foot_right:       { x: 62,  y: 92 },
+  head: { x: 50, y: 3.5 }, jaw: { x: 50, y: 8.5 },
+  eye_left: { x: 47, y: 3.5 }, eye_right: { x: 53, y: 3.5 },
+  neck: { x: 50, y: 11.5 },
+  shoulder_left: { x: 28, y: 16 }, shoulder_right: { x: 72, y: 16 },
+  upper_arm_left: { x: 22, y: 23 }, upper_arm_right: { x: 78, y: 23 },
+  elbow_left: { x: 17, y: 31 }, elbow_right: { x: 83, y: 31 },
+  forearm_left: { x: 13, y: 38 }, forearm_right: { x: 87, y: 38 },
+  wrist_left: { x: 9, y: 44 }, wrist_right: { x: 91, y: 44 },
+  hand_left: { x: 6, y: 50 }, hand_right: { x: 94, y: 50 },
+  chest: { x: 50, y: 22 }, ribcage: { x: 44, y: 28 },
+  upper_back: { x: 50, y: 24 }, abdomen: { x: 50, y: 35 },
+  spine: { x: 50, y: 30 }, lower_back: { x: 50, y: 38 },
+  pelvis: { x: 50, y: 42 },
+  hip_left: { x: 40, y: 44 }, hip_right: { x: 60, y: 44 },
+  thigh_left: { x: 38, y: 55 }, thigh_right: { x: 62, y: 55 },
+  knee_left: { x: 38, y: 64 }, knee_right: { x: 62, y: 64 },
+  shin_left: { x: 38, y: 73 }, shin_right: { x: 62, y: 73 },
+  calf_left: { x: 38, y: 75 }, calf_right: { x: 62, y: 75 },
+  ankle_left: { x: 38, y: 84 }, ankle_right: { x: 62, y: 84 },
+  foot_left: { x: 38, y: 92 }, foot_right: { x: 62, y: 92 },
 };
 
-/**
- * Organ view positions (organs-front.png is upper-body focused, 3029×2693).
- * Adjusted for the different image proportions.
- */
-/**
- * Calibrated against organs-front.png (3029×2693px).
- * Image has "Internal organs" title at top (~4%), body from ~6% to ~95%.
- * Upper-body focused — legs only partially visible.
- */
 const REGION_POS_ORGANS: Record<string, { x: number; y: number }> = {
-  head:             { x: 50,  y: 7 },
-  jaw:              { x: 50,  y: 13 },
-  eye_left:         { x: 47,  y: 7 },
-  eye_right:        { x: 53,  y: 7 },
-  neck:             { x: 50,  y: 18 },
-  shoulder_left:    { x: 32,  y: 24 },
-  shoulder_right:   { x: 68,  y: 24 },
-  chest:            { x: 50,  y: 32 },   // lungs & heart area
-  ribcage:          { x: 44,  y: 38 },
-  upper_back:       { x: 50,  y: 34 },
-  abdomen:          { x: 50,  y: 50 },   // stomach / spleen level
-  spine:            { x: 50,  y: 44 },
-  lower_back:       { x: 50,  y: 56 },
-  pelvis:           { x: 50,  y: 68 },
-  hip_left:         { x: 40,  y: 70 },
-  hip_right:        { x: 60,  y: 70 },
-  upper_arm_left:   { x: 22,  y: 34 },
-  upper_arm_right:  { x: 78,  y: 34 },
-  elbow_left:       { x: 16,  y: 46 },
-  elbow_right:      { x: 84,  y: 46 },
-  forearm_left:     { x: 12,  y: 56 },
-  forearm_right:    { x: 88,  y: 56 },
-  wrist_left:       { x: 9,   y: 64 },
-  wrist_right:      { x: 91,  y: 64 },
-  hand_left:        { x: 7,   y: 70 },
-  hand_right:       { x: 93,  y: 70 },
-  thigh_left:       { x: 40,  y: 82 },
-  thigh_right:      { x: 60,  y: 82 },
-  knee_left:        { x: 40,  y: 94 },
-  knee_right:       { x: 60,  y: 94 },
+  head: { x: 50, y: 7 }, jaw: { x: 50, y: 13 },
+  eye_left: { x: 47, y: 7 }, eye_right: { x: 53, y: 7 },
+  neck: { x: 50, y: 18 },
+  shoulder_left: { x: 32, y: 24 }, shoulder_right: { x: 68, y: 24 },
+  chest: { x: 50, y: 32 }, ribcage: { x: 44, y: 38 },
+  upper_back: { x: 50, y: 34 }, abdomen: { x: 50, y: 50 },
+  spine: { x: 50, y: 44 }, lower_back: { x: 50, y: 56 },
+  pelvis: { x: 50, y: 68 },
+  hip_left: { x: 40, y: 70 }, hip_right: { x: 60, y: 70 },
+  upper_arm_left: { x: 22, y: 34 }, upper_arm_right: { x: 78, y: 34 },
+  elbow_left: { x: 16, y: 46 }, elbow_right: { x: 84, y: 46 },
+  forearm_left: { x: 12, y: 56 }, forearm_right: { x: 88, y: 56 },
+  wrist_left: { x: 9, y: 64 }, wrist_right: { x: 91, y: 64 },
+  hand_left: { x: 7, y: 70 }, hand_right: { x: 93, y: 70 },
+  thigh_left: { x: 40, y: 82 }, thigh_right: { x: 60, y: 82 },
+  knee_left: { x: 40, y: 94 }, knee_right: { x: 60, y: 94 },
 };
 
-function getSeverityInfo(severity: number) {
-  if (severity >= 8) return { color: "#ef4444", glow: "rgba(239,68,68,0.7)", label: "重症", bg: "rgba(239,68,68,0.15)" };
-  if (severity >= 5) return { color: "#f97316", glow: "rgba(249,115,22,0.7)", label: "中度", bg: "rgba(249,115,22,0.15)" };
-  return { color: "#facc15", glow: "rgba(250,204,21,0.7)", label: "軽度", bg: "rgba(250,204,21,0.15)" };
+function getSeverityInfo(severity: number, dict: ReturnType<typeof getDictionary>) {
+  if (severity >= 8) return { color: "#ef4444", glow: "rgba(239,68,68,0.7)", label: dict.injury.severe, bg: "rgba(239,68,68,0.15)" };
+  if (severity >= 5) return { color: "#f97316", glow: "rgba(249,115,22,0.7)", label: dict.injury.moderate, bg: "rgba(249,115,22,0.15)" };
+  return { color: "#facc15", glow: "rgba(250,204,21,0.7)", label: dict.injury.mild, bg: "rgba(250,204,21,0.15)" };
 }
 
-function getRegionLabel(region: string): string {
-  const labels: Record<string, string> = {
-    head: "頭部", neck: "首", shoulder_left: "左肩", shoulder_right: "右肩",
-    upper_arm_left: "左上腕", upper_arm_right: "右上腕", elbow_left: "左肘", elbow_right: "右肘",
-    forearm_left: "左前腕", forearm_right: "右前腕", chest: "胸部", upper_back: "上背部",
-    lower_back: "腰部", abdomen: "腹部", hip_left: "左股関節", hip_right: "右股関節",
-    thigh_left: "左太もも", thigh_right: "右太もも", knee_left: "左膝", knee_right: "右膝",
-    ankle_left: "左足首", ankle_right: "右足首", foot_left: "左足", foot_right: "右足",
-    pelvis: "骨盤", ribcage: "肋骨", spine: "脊椎", jaw: "顎",
-    eye_left: "左眼", eye_right: "右眼", wrist_left: "左手首", wrist_right: "右手首",
-    hand_left: "左手", hand_right: "右手", shin_left: "左脛", shin_right: "右脛",
-    calf_left: "左ふくらはぎ", calf_right: "右ふくらはぎ",
-  };
-  return labels[region] ?? region;
-}
-
-export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }) {
+export default function InjuryBodyMap({ injuries, locale = "ja" }: { injuries: InjuryRecord[]; locale?: Locale }) {
+  const dict = getDictionary(locale);
+  const isJa = locale === "ja";
   const [selected, setSelected] = useState<InjuryRecord | null>(null);
   const [view, setView] = useState<ViewMode>("musculoskeletal");
 
   const positions = view === "musculoskeletal" ? REGION_POS_MUSCLE : REGION_POS_ORGANS;
+
+  const VIEW_CONFIG: Record<ViewMode, { label: string; src: string }> = {
+    musculoskeletal: {
+      label: dict.injury.musculoskeletal,
+      src: "/Reborn/images/anatomy/muscular-front.png",
+    },
+    organs: {
+      label: dict.injury.organs,
+      src: "/Reborn/images/anatomy/organs-front.png",
+    },
+  };
+
+  function getRegionLabel(region: string): string {
+    return (dict.bodyRegions as Record<string, string>)[region] ?? region;
+  }
 
   return (
     <div className="space-y-6">
@@ -176,10 +104,9 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
             className="relative rounded-xl overflow-hidden border border-border/50"
             style={{ background: "linear-gradient(180deg, #0c0c1a 0%, #111125 100%)" }}
           >
-            {/* Anatomy image */}
             <img
               src={VIEW_CONFIG[view].src}
-              alt={`人体解剖図（${VIEW_CONFIG[view].label}）`}
+              alt={dict.injury.anatomyAlt.replace("{view}", VIEW_CONFIG[view].label)}
               className="w-full h-auto transition-opacity duration-300"
               style={{
                 filter: "invert(0.88) hue-rotate(180deg) saturate(0.6) brightness(0.85)",
@@ -188,31 +115,21 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
               }}
             />
 
-            {/* Injury markers overlay */}
             {injuries.map((injury) => {
               const pos = positions[injury.body_region];
               if (!pos) return null;
-              const { color, glow } = getSeverityInfo(injury.severity);
+              const { color, glow } = getSeverityInfo(injury.severity, dict);
               const isSelected = selected?.id === injury.id;
               const size = isSelected ? 18 : 12 + Math.min(injury.severity * 0.5, 4);
 
               return (
                 <button
                   key={injury.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelected(isSelected ? null : injury);
-                  }}
+                  onClick={(e) => { e.stopPropagation(); setSelected(isSelected ? null : injury); }}
                   className="absolute -translate-x-1/2 -translate-y-1/2 transition-all duration-200"
-                  style={{
-                    left: `${pos.x}%`,
-                    top: `${pos.y}%`,
-                    width: size,
-                    height: size,
-                  }}
-                  title={`${injury.diagnosis}（${getRegionLabel(injury.body_region)}）`}
+                  style={{ left: `${pos.x}%`, top: `${pos.y}%`, width: size, height: size }}
+                  title={`${injury.diagnosis}${isJa ? "\uff08" : " ("}${getRegionLabel(injury.body_region)}${isJa ? "\uff09" : ")"}`}
                 >
-                  {/* Pulse ring */}
                   <span
                     className="absolute inset-0 rounded-full animate-ping"
                     style={{
@@ -221,7 +138,6 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
                       animationDuration: injury.is_primary ? "1.5s" : "2.5s",
                     }}
                   />
-                  {/* Core dot */}
                   <span
                     className="absolute inset-0 rounded-full"
                     style={{
@@ -230,7 +146,6 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
                       border: isSelected ? "2px solid #fff" : "1px solid rgba(255,255,255,0.3)",
                     }}
                   />
-                  {/* Label on select */}
                   {isSelected && (
                     <span
                       className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/90 px-2 py-0.5 text-[10px] font-bold text-white"
@@ -243,7 +158,6 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
               );
             })}
 
-            {/* Attribution */}
             <p className="absolute bottom-1 right-2 text-[8px] text-white/20">
               Wikimedia Commons (Public Domain)
             </p>
@@ -253,11 +167,11 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
         {/* Injury detail cards */}
         <div className="flex-1 space-y-3">
           <h3 className="text-xs font-medium tracking-widest text-muted uppercase mb-4">
-            怪我一覧（{injuries.length}件）
+            {dict.injury.injuryList.replace("{n}", String(injuries.length))}
           </h3>
 
           {injuries.map((injury) => {
-            const { color, label, bg } = getSeverityInfo(injury.severity);
+            const { color, label, bg } = getSeverityInfo(injury.severity, dict);
             const isSelected = selected?.id === injury.id;
 
             return (
@@ -284,15 +198,15 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
                     </span>
                     {injury.is_primary && (
                       <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-accent/10 text-accent">
-                        主傷
+                        {dict.injury.primary}
                       </span>
                     )}
                   </div>
                   <p className="text-muted mt-1">
-                    {getRegionLabel(injury.body_region)} — {injury.injury_type}
+                    {getRegionLabel(injury.body_region)} \u2014 {injury.injury_type}
                   </p>
                   <p className="text-muted mt-0.5">
-                    {injury.year_occurred}年 / 回復 {injury.recovery_months}ヶ月
+                    {injury.year_occurred}{isJa ? `\u5e74 / \u56de\u5fa9 ${injury.recovery_months}\u30f6\u6708` : ` / ${injury.recovery_months} months recovery`}
                   </p>
                   {isSelected && (
                     <p className="mt-2 text-foreground/80 leading-relaxed border-t border-border/30 pt-2">
@@ -308,15 +222,15 @@ export default function InjuryBodyMap({ injuries }: { injuries: InjuryRecord[] }
           <div className="flex items-center gap-4 pt-3 text-xs text-muted">
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#ef4444" }} />
-              重症 (8-10)
+              {dict.injury.severe} (8-10)
             </div>
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#f97316" }} />
-              中度 (5-7)
+              {dict.injury.moderate} (5-7)
             </div>
             <div className="flex items-center gap-1.5">
               <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "#facc15" }} />
-              軽度 (1-4)
+              {dict.injury.mild} (1-4)
             </div>
           </div>
         </div>

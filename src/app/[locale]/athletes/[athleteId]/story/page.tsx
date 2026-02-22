@@ -1,38 +1,41 @@
-import { getAthleteById, getStoryByAthleteId } from "@/lib/mock-data";
+import { getAthleteById, getStoryByAthleteId } from "@/lib/data";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/locale-context";
 import { notFound } from "next/navigation";
 import { ChapterNarrator, FullStoryNarrator } from "@/components/StoryNarrator";
-
-const STAGE_META: Record<string, { label: string; icon: string; colorClass: string; color: string }> = {
-  origin: { label: "根源", icon: "01", colorClass: "stage-origin", color: "#f59e0b" },
-  despair: { label: "絶望", icon: "02", colorClass: "stage-despair", color: "#ef4444" },
-  void: { label: "空白", icon: "03", colorClass: "stage-void", color: "#6b7280" },
-  awakening: { label: "覚醒", icon: "04", colorClass: "stage-awakening", color: "#a855f7" },
-  rebirth: { label: "再誕", icon: "05", colorClass: "stage-rebirth", color: "#10b981" },
-};
 
 export default async function StoryPage({
   params,
 }: {
-  params: Promise<{ athleteId: string }>;
+  params: Promise<{ locale: string; athleteId: string }>;
 }) {
-  const { athleteId } = await params;
-  const athlete = getAthleteById(athleteId);
+  const { locale, athleteId } = await params;
+  const loc = (locale === "en" ? "en" : "ja") as Locale;
+  const dict = getDictionary(loc);
+  const athlete = getAthleteById(athleteId, loc);
   if (!athlete) return notFound();
 
-  const chapters = getStoryByAthleteId(athleteId);
+  const chapters = getStoryByAthleteId(athleteId, loc);
+
+  const STAGE_META: Record<string, { label: string; icon: string; colorClass: string; color: string }> = {
+    origin: { label: dict.story.stageOrigin, icon: "01", colorClass: "stage-origin", color: "#f59e0b" },
+    despair: { label: dict.story.stageDespair, icon: "02", colorClass: "stage-despair", color: "#ef4444" },
+    void: { label: dict.story.stageVoid, icon: "03", colorClass: "stage-void", color: "#6b7280" },
+    awakening: { label: dict.story.stageAwakening, icon: "04", colorClass: "stage-awakening", color: "#a855f7" },
+    rebirth: { label: dict.story.stageRebirth, icon: "05", colorClass: "stage-rebirth", color: "#10b981" },
+  };
 
   return (
     <div>
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-xs font-medium tracking-widest text-muted uppercase">
-            復活の物語
+            {dict.story.title}
           </h2>
           <p className="mt-2 text-sm text-muted">
-            5つの章で紐解く、{athlete.name}の復活劇
+            {dict.story.subtitle.replace("{name}", athlete.name)}
           </p>
         </div>
-        {/* Full story narration button */}
         <FullStoryNarrator
           chapters={chapters.map((ch) => ({
             id: ch.id,
@@ -42,6 +45,7 @@ export default async function StoryPage({
             year_label: ch.year_label,
           }))}
           athleteName={athlete.name}
+          locale={loc}
         />
       </div>
 
@@ -57,7 +61,6 @@ export default async function StoryPage({
                 border: "1px solid var(--glass-border)",
               }}
             >
-              {/* Chapter Header */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-baseline gap-4">
                   <span
@@ -76,7 +79,6 @@ export default async function StoryPage({
                     <h3 className="mt-1 text-xl font-bold">{chapter.title}</h3>
                   </div>
                 </div>
-                {/* Per-chapter narration */}
                 <ChapterNarrator
                   chapter={{
                     id: chapter.id,
@@ -85,13 +87,13 @@ export default async function StoryPage({
                     stage: chapter.stage,
                     year_label: chapter.year_label,
                   }}
+                  locale={loc}
                 />
               </div>
 
-              {/* Chapter Body */}
               <div className="mt-4 space-y-4 pl-0 sm:pl-14">
                 {chapter.body.split("\n\n").map((paragraph, i) => {
-                  if (paragraph.startsWith("「") || paragraph.startsWith("『")) {
+                  if (paragraph.startsWith("\u300c") || paragraph.startsWith("\u300e") || paragraph.startsWith("\"")) {
                     return (
                       <blockquote
                         key={i}

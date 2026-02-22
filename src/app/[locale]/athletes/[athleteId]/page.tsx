@@ -3,51 +3,57 @@ import {
   getQuotesByAthleteId,
   getTestimoniesByAthleteId,
   getInjuriesByAthleteId,
-} from "@/lib/mock-data";
+} from "@/lib/data";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/locale-context";
 import { notFound } from "next/navigation";
 import { QuoteNarrator, TestimonyNarrator, SectionNarrator } from "@/components/QuoteNarrator";
 
 export default async function AthleteProfilePage({
   params,
 }: {
-  params: Promise<{ athleteId: string }>;
+  params: Promise<{ locale: string; athleteId: string }>;
 }) {
-  const { athleteId } = await params;
-  const athlete = getAthleteById(athleteId);
+  const { locale, athleteId } = await params;
+  const loc = (locale === "en" ? "en" : "ja") as Locale;
+  const dict = getDictionary(loc);
+  const isJa = loc === "ja";
+  const athlete = getAthleteById(athleteId, loc);
   if (!athlete) return notFound();
 
-  const quotes = getQuotesByAthleteId(athleteId);
-  const testimoniesList = getTestimoniesByAthleteId(athleteId);
-  const injuries = getInjuriesByAthleteId(athleteId);
+  const quotes = getQuotesByAthleteId(athleteId, loc);
+  const testimoniesList = getTestimoniesByAthleteId(athleteId, loc);
+  const injuries = getInjuriesByAthleteId(athleteId, loc);
 
-  // Build full injury text for section-level TTS
   const injuryText = [
     athlete.injury_detail,
     ...injuries.map(
-      (inj) => `${inj.diagnosis}。${inj.description}。${inj.year_occurred}年、回復${inj.recovery_months}ヶ月`
+      (inj) => isJa
+        ? `${inj.diagnosis}\u3002${inj.description}\u3002${inj.year_occurred}\u5e74\u3001\u56de\u5fa9${inj.recovery_months}\u30f6\u6708`
+        : `${inj.diagnosis}. ${inj.description}. ${inj.year_occurred}, ${inj.recovery_months} months recovery`
     ),
-  ].join("。\n");
+  ].join(isJa ? "\u3002\n" : ".\n");
 
   return (
     <div className="space-y-12">
       {/* Bio */}
       <section className="glass-card rounded-xl p-6">
-        <h2 className="text-xs font-medium tracking-widest text-muted uppercase">基本情報</h2>
+        <h2 className="text-xs font-medium tracking-widest text-muted uppercase">{dict.profile.basicInfo}</h2>
         <dl className="mt-4 grid grid-cols-1 gap-y-3 text-sm sm:grid-cols-2 sm:gap-x-8">
           <div>
-            <dt className="text-muted">国籍</dt>
+            <dt className="text-muted">{dict.profile.nationality}</dt>
             <dd className="mt-0.5 font-medium">{athlete.nationality}</dd>
           </div>
           <div>
-            <dt className="text-muted">出身地</dt>
+            <dt className="text-muted">{dict.profile.birthplace}</dt>
             <dd className="mt-0.5 font-medium">{athlete.birthplace}</dd>
           </div>
           <div>
-            <dt className="text-muted">生年月日・年齢</dt>
-            <dd className="mt-0.5 font-medium">{athlete.birth_date}（{athlete.age}歳）</dd>
+            <dt className="text-muted">{dict.profile.birthDateAge}</dt>
+            <dd className="mt-0.5 font-medium">{athlete.birth_date}{isJa ? `\uff08${athlete.age}\u6b73\uff09` : ` (${athlete.age})`}</dd>
           </div>
           <div>
-            <dt className="text-muted">家族構成</dt>
+            <dt className="text-muted">{dict.profile.family}</dt>
             <dd className="mt-0.5 font-medium">{athlete.family}</dd>
           </div>
         </dl>
@@ -55,11 +61,11 @@ export default async function AthleteProfilePage({
 
       {/* Achievements */}
       <section className="glass-card rounded-xl p-6">
-        <h2 className="text-xs font-medium tracking-widest text-muted uppercase">主な功績</h2>
+        <h2 className="text-xs font-medium tracking-widest text-muted uppercase">{dict.profile.achievements}</h2>
         <ul className="mt-4 space-y-1">
           {athlete.achievements.map((a, i) => (
             <li key={i} className="text-sm">
-              <span className="mr-2 text-accent">—</span>
+              <span className="mr-2 text-accent">\u2014</span>
               {a}
             </li>
           ))}
@@ -69,8 +75,8 @@ export default async function AthleteProfilePage({
       {/* Injury */}
       <section className="glass-card rounded-xl p-6">
         <div className="flex items-start justify-between gap-3">
-          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">負傷の詳細</h2>
-          <SectionNarrator text={injuryText} label="怪我情報を読み上げ" />
+          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">{dict.profile.injuryDetail}</h2>
+          <SectionNarrator text={injuryText} label={dict.profile.injuryNarrate} locale={loc} />
         </div>
         <p className="mt-4 text-sm font-medium text-accent leading-relaxed">
           {athlete.injury_detail}
@@ -98,7 +104,7 @@ export default async function AthleteProfilePage({
                 <div>
                   <p className="font-medium">{inj.diagnosis}</p>
                   <p className="text-muted">
-                    {inj.description} — {inj.year_occurred}年 / 回復{inj.recovery_months}ヶ月
+                    {inj.description} {isJa ? "\u2014" : "\u2014"} {inj.year_occurred}{isJa ? `\u5e74 / \u56de\u5fa9${inj.recovery_months}\u30f6\u6708` : ` / ${inj.recovery_months} months recovery`}
                   </p>
                 </div>
               </div>
@@ -110,7 +116,7 @@ export default async function AthleteProfilePage({
       {/* Golden Quotes */}
       {quotes.length > 0 && (
         <section>
-          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">金言</h2>
+          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">{dict.profile.goldenQuotes}</h2>
           <div className="mt-4 space-y-6">
             {quotes.map((q) => (
               <blockquote
@@ -120,13 +126,13 @@ export default async function AthleteProfilePage({
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm italic leading-relaxed">
-                    「{q.quote}」
+                    {isJa ? `\u300c${q.quote}\u300d` : `"${q.quote}"`}
                   </p>
-                  <QuoteNarrator quote={q.quote} context={q.context ?? undefined} />
+                  <QuoteNarrator quote={q.quote} context={q.context ?? undefined} locale={loc} />
                 </div>
                 {q.context && (
                   <footer className="mt-1 text-xs text-muted">
-                    — {q.context}
+                    \u2014 {q.context}
                   </footer>
                 )}
               </blockquote>
@@ -138,7 +144,7 @@ export default async function AthleteProfilePage({
       {/* Testimonies */}
       {testimoniesList.length > 0 && (
         <section>
-          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">周囲の証言</h2>
+          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">{dict.profile.testimonies}</h2>
           <div className="mt-4 space-y-4">
             {testimoniesList.map((t) => (
               <blockquote
@@ -147,16 +153,17 @@ export default async function AthleteProfilePage({
               >
                 <div className="flex items-start justify-between gap-2">
                   <p className="text-sm italic leading-relaxed">
-                    「{t.quote}」
+                    {isJa ? `\u300c${t.quote}\u300d` : `"${t.quote}"`}
                   </p>
                   <TestimonyNarrator
                     quote={t.quote}
                     speaker={t.speaker_name}
                     role={t.speaker_role}
+                    locale={loc}
                   />
                 </div>
                 <footer className="mt-2 text-xs text-muted">
-                  — {t.speaker_name}（{t.speaker_role}）
+                  \u2014 {t.speaker_name}{isJa ? `\uff08${t.speaker_role}\uff09` : ` (${t.speaker_role})`}
                 </footer>
               </blockquote>
             ))}

@@ -1,91 +1,137 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { Locale } from "@/lib/locale-context";
+import { getDictionary } from "@/lib/i18n";
 
 type TTSMode = "normal" | "emotional";
 type StoryStage = "origin" | "despair" | "void" | "awakening" | "rebirth" | null;
 
 interface TextToSpeechProps {
-  /** Text to read aloud */
   text: string;
-  /** Label shown on the button */
   label?: string;
-  /** Reading mode: "emotional" adds pitch/rate variation for quotes */
   mode?: TTSMode;
-  /** Compact button style (icon only) */
   compact?: boolean;
-  /** Story stage for stage-aware intonation */
   stage?: StoryStage;
+  locale?: Locale;
 }
 
-// Preferred Japanese voices (ranked by quality)
-const PREFERRED_VOICES = [
-  "Microsoft Nanami Online",   // Edge neural voice (very natural)
-  "Google 日本語",              // Chrome
-  "Nanami",                    // Edge
-  "Kyoko",                     // macOS / iOS
-  "O-Ren",                     // macOS
-  "Hattori",                   // macOS
-  "ja-JP",                     // Generic Japanese
+// Preferred Japanese voices
+const PREFERRED_JA_VOICES = [
+  "Microsoft Nanami Online",
+  "Google \u65e5\u672c\u8a9e",
+  "Nanami",
+  "Kyoko",
+  "O-Ren",
+  "Hattori",
+  "ja-JP",
 ];
 
-function findBestJapaneseVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | null {
-  // Try preferred voices first
-  for (const pref of PREFERRED_VOICES) {
+// Preferred English voices
+const PREFERRED_EN_VOICES = [
+  "Microsoft Jenny Online",
+  "Google US English",
+  "Samantha",
+  "Alex",
+  "en-US",
+  "en-GB",
+];
+
+function findBestVoice(voices: SpeechSynthesisVoice[], locale: Locale): SpeechSynthesisVoice | null {
+  const preferred = locale === "en" ? PREFERRED_EN_VOICES : PREFERRED_JA_VOICES;
+  const langPrefix = locale === "en" ? "en" : "ja";
+
+  for (const pref of preferred) {
     const match = voices.find(
-      (v) => v.name.includes(pref) || v.lang.startsWith("ja")
+      (v) => v.name.includes(pref) || v.lang.startsWith(langPrefix)
     );
     if (match) return match;
   }
-  // Fallback: any Japanese voice
-  return voices.find((v) => v.lang.startsWith("ja")) ?? null;
+  return voices.find((v) => v.lang.startsWith(langPrefix)) ?? null;
 }
-
-// --- Emotion detection ---
 
 type Emotion = "neutral" | "sorrow" | "triumph" | "tension" | "quiet" | "warm";
 
-const EMOTION_KEYWORDS: { emotion: Emotion; words: string[] }[] = [
+const EMOTION_KEYWORDS_JA: { emotion: Emotion; words: string[] }[] = [
   {
     emotion: "sorrow",
     words: [
-      "絶望", "苦痛", "涙", "挫折", "崩れ", "失", "悲", "痛み", "暗闇",
-      "苦し", "泣", "地獄", "恐怖", "不安", "孤独", "断裂", "破壊", "終わり",
-      "もう駄目", "全治", "手術", "引退", "離脱", "重傷",
+      "\u7d76\u671b", "\u82e6\u75db", "\u6d99", "\u632b\u6298", "\u5d29\u308c", "\u5931", "\u60b2", "\u75db\u307f", "\u6697\u95c7",
+      "\u82e6\u3057", "\u6ce3", "\u5730\u7344", "\u6050\u6016", "\u4e0d\u5b89", "\u5b64\u72ec", "\u65ad\u88c2", "\u7834\u58ca", "\u7d42\u308f\u308a",
+      "\u3082\u3046\u99c4\u76ee", "\u5168\u6cbb", "\u624b\u8853", "\u5f15\u9000", "\u96e2\u8131", "\u91cd\u50b7",
     ],
   },
   {
     emotion: "triumph",
     words: [
-      "復活", "勝利", "栄光", "奇跡", "歓喜", "達成", "優勝", "金メダル",
-      "復帰", "成し遂げ", "超え", "打ち勝", "再び", "戻って", "輝",
-      "歓声", "世界一", "記録", "証明", "信じ",
+      "\u5fa9\u6d3b", "\u52dd\u5229", "\u6804\u5149", "\u5947\u8de1", "\u6b53\u559c", "\u9054\u6210", "\u512a\u52dd", "\u91d1\u30e1\u30c0\u30eb",
+      "\u5fa9\u5e30", "\u6210\u3057\u9042\u3052", "\u8d85\u3048", "\u6253\u3061\u52dd", "\u518d\u3073", "\u623b\u3063\u3066", "\u8f1d",
+      "\u6b53\u58f0", "\u4e16\u754c\u4e00", "\u8a18\u9332", "\u8a3c\u660e", "\u4fe1\u3058",
     ],
   },
   {
     emotion: "tension",
     words: [
-      "決断", "覚悟", "運命", "賭け", "瀬戸際", "限界", "挑", "闘",
-      "立ち上が", "必死", "命がけ", "ギリギリ", "最後の", "一か八か",
+      "\u6c7a\u65ad", "\u899a\u609f", "\u904b\u547d", "\u8ced\u3051", "\u702c\u6238\u969b", "\u9650\u754c", "\u6311", "\u95d8",
+      "\u7acb\u3061\u4e0a\u304c", "\u5fc5\u6b7b", "\u547d\u304c\u3051", "\u30ae\u30ea\u30ae\u30ea", "\u6700\u5f8c\u306e", "\u4e00\u304b\u516b\u304b",
     ],
   },
   {
     emotion: "quiet",
     words: [
-      "静か", "空白", "無", "沈黙", "ただ", "一人", "じっと", "長い",
-      "見つめ", "待", "耐え", "日々", "繰り返",
+      "\u9759\u304b", "\u7a7a\u767d", "\u7121", "\u6c88\u9ed9", "\u305f\u3060", "\u4e00\u4eba", "\u3058\u3063\u3068", "\u9577\u3044",
+      "\u898b\u3064\u3081", "\u5f85", "\u8010\u3048", "\u65e5\u3005", "\u7e70\u308a\u8fd4",
     ],
   },
   {
     emotion: "warm",
     words: [
-      "支え", "仲間", "家族", "感謝", "愛", "絆", "恩", "共に",
-      "寄り添", "励まし", "信頼", "笑顔",
+      "\u652f\u3048", "\u4ef2\u9593", "\u5bb6\u65cf", "\u611f\u8b1d", "\u611b", "\u7d46", "\u6069", "\u5171\u306b",
+      "\u5bc4\u308a\u6dfb", "\u52b1\u307e\u3057", "\u4fe1\u983c", "\u7b11\u9854",
     ],
   },
 ];
 
-/** Stage-level base tone adjustments */
+const EMOTION_KEYWORDS_EN: { emotion: Emotion; words: string[] }[] = [
+  {
+    emotion: "sorrow",
+    words: [
+      "despair", "pain", "tears", "devastat", "shatter", "loss", "grief", "agony",
+      "darkness", "suffer", "cry", "hell", "fear", "anxiety", "lonely", "rupture",
+      "destroy", "end", "hopeless", "surgery", "retire", "sidelined", "critical",
+    ],
+  },
+  {
+    emotion: "triumph",
+    words: [
+      "comeback", "victory", "glory", "miracle", "triumph", "achiev", "champion", "gold medal",
+      "return", "accomplish", "overcom", "conquer", "again", "back", "shine",
+      "cheer", "world best", "record", "prove", "believ",
+    ],
+  },
+  {
+    emotion: "tension",
+    words: [
+      "decision", "resolve", "destiny", "gamble", "brink", "limit", "challeng", "fight",
+      "rise", "desperate", "life-or-death", "razor", "final", "all-or-nothing",
+    ],
+  },
+  {
+    emotion: "quiet",
+    words: [
+      "quiet", "void", "nothing", "silence", "just", "alone", "still", "long",
+      "stare", "wait", "endure", "days", "repeat",
+    ],
+  },
+  {
+    emotion: "warm",
+    words: [
+      "support", "teammate", "family", "grate", "love", "bond", "owe", "together",
+      "beside", "encourage", "trust", "smile",
+    ],
+  },
+];
+
 const STAGE_TONE: Record<string, { pitchBase: number; rateBase: number }> = {
   origin:    { pitchBase: 1.02, rateBase: 0.97 },
   despair:   { pitchBase: 0.88, rateBase: 0.88 },
@@ -104,11 +150,13 @@ interface Segment {
   hasDash: boolean;
 }
 
-function detectEmotion(text: string): Emotion {
+function detectEmotion(text: string, locale: Locale): Emotion {
+  const keywords = locale === "en" ? EMOTION_KEYWORDS_EN : EMOTION_KEYWORDS_JA;
   let best: Emotion = "neutral";
   let bestCount = 0;
-  for (const { emotion, words } of EMOTION_KEYWORDS) {
-    const count = words.filter((w) => text.includes(w)).length;
+  for (const { emotion, words } of keywords) {
+    const lowerText = text.toLowerCase();
+    const count = words.filter((w) => lowerText.includes(w.toLowerCase())).length;
     if (count > bestCount) {
       bestCount = count;
       best = emotion;
@@ -117,53 +165,53 @@ function detectEmotion(text: string): Emotion {
   return best;
 }
 
-// Regex for long dashes: ——, ――, ーー, --, ─── etc. (2+ consecutive)
-const DASH_RE = /[—―─ー\-]{2,}/;
+const DASH_RE = /[\u2014\u2015\u2500\u30fc\-]{2,}/;
 
-/** Split text into sentence-level segments with emotion metadata */
-function splitIntoSegments(text: string): Segment[] {
+function splitIntoSegments(text: string, locale: Locale): Segment[] {
   const paragraphs = text.split(/\n+/).filter((p) => p.trim());
   const segments: Segment[] = [];
 
   for (const para of paragraphs) {
     const trimmed = para.trim();
-    const isQuote = trimmed.startsWith("「") || trimmed.startsWith("『") || trimmed.startsWith("\"");
+    const isQuote = locale === "ja"
+      ? (trimmed.startsWith("\u300c") || trimmed.startsWith("\u300e") || trimmed.startsWith("\""))
+      : (trimmed.startsWith("\"") || trimmed.startsWith("\u201c") || trimmed.startsWith("\u300c"));
 
-    // Split paragraph into sentences (by 。！？… but keep the delimiter)
-    // Note: 」』 are NOT split points — they should flow naturally
+    const sentenceRegex = locale === "en"
+      ? /(?<=[.!?])\s+/g
+      : /(?<=[\u3002\uff01\uff1f\u2026])/g;
+
     const sentences = trimmed
-      .split(/(?<=[。！？…])/g)
+      .split(sentenceRegex)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
     const parts = sentences.length > 0 ? sentences : [trimmed];
 
     for (const sentence of parts) {
-      // Further split on long dashes (——) to create a pause boundary
       if (DASH_RE.test(sentence)) {
         const subParts = sentence.split(DASH_RE).map((s) => s.trim()).filter((s) => s.length > 0);
         subParts.forEach((sub, i) => {
-          // Strip any remaining stray single dashes at edges
-          const cleaned = sub.replace(/^[—―─ー\-]+|[—―─ー\-]+$/g, "").trim();
+          const cleaned = sub.replace(/^[\u2014\u2015\u2500\u30fc\-]+|[\u2014\u2015\u2500\u30fc\-]+$/g, "").trim();
           if (!cleaned) return;
           segments.push({
             text: cleaned,
             isQuote,
-            emotion: detectEmotion(cleaned),
-            hasExclamation: /！|!/.test(cleaned),
-            hasQuestion: /？|\?/.test(cleaned),
-            hasEllipsis: /…|\.\.\./.test(cleaned),
-            hasDash: i < subParts.length - 1, // mark all but last sub-part
+            emotion: detectEmotion(cleaned, locale),
+            hasExclamation: /\uff01|!/.test(cleaned),
+            hasQuestion: /\uff1f|\?/.test(cleaned),
+            hasEllipsis: /\u2026|\.\.\./.test(cleaned),
+            hasDash: i < subParts.length - 1,
           });
         });
       } else {
         segments.push({
           text: sentence,
           isQuote,
-          emotion: detectEmotion(sentence),
-          hasExclamation: /！|!/.test(sentence),
-          hasQuestion: /？|\?/.test(sentence),
-          hasEllipsis: /…|\.\.\./.test(sentence),
+          emotion: detectEmotion(sentence, locale),
+          hasExclamation: /\uff01|!/.test(sentence),
+          hasQuestion: /\uff1f|\?/.test(sentence),
+          hasEllipsis: /\u2026|\.\.\./.test(sentence),
           hasDash: false,
         });
       }
@@ -173,13 +221,11 @@ function splitIntoSegments(text: string): Segment[] {
   return segments;
 }
 
-/** Calculate pitch and rate for a segment based on emotion + context */
 function getVoiceParams(
   seg: Segment,
   stage: StoryStage,
   baseRate: number,
 ): { pitch: number; rate: number } {
-  // Start with stage-level tone
   const stageTone = stage && STAGE_TONE[stage]
     ? STAGE_TONE[stage]
     : { pitchBase: 1.0, rateBase: 1.0 };
@@ -187,49 +233,19 @@ function getVoiceParams(
   let pitch = stageTone.pitchBase;
   let rate = baseRate * stageTone.rateBase;
 
-  // Emotion adjustments (layered on top of stage)
   switch (seg.emotion) {
-    case "sorrow":
-      pitch *= 0.90;
-      rate *= 0.85;
-      break;
-    case "triumph":
-      pitch *= 1.12;
-      rate *= 1.05;
-      break;
-    case "tension":
-      pitch *= 1.05;
-      rate *= 0.92;
-      break;
-    case "quiet":
-      pitch *= 0.95;
-      rate *= 0.82;
-      break;
-    case "warm":
-      pitch *= 1.06;
-      rate *= 0.93;
-      break;
+    case "sorrow":  pitch *= 0.90; rate *= 0.85; break;
+    case "triumph": pitch *= 1.12; rate *= 1.05; break;
+    case "tension": pitch *= 1.05; rate *= 0.92; break;
+    case "quiet":   pitch *= 0.95; rate *= 0.82; break;
+    case "warm":    pitch *= 1.06; rate *= 0.93; break;
   }
 
-  // Quote: slightly slower, more expressive
-  if (seg.isQuote) {
-    pitch *= 1.08;
-    rate *= 0.90;
-  }
+  if (seg.isQuote) { pitch *= 1.08; rate *= 0.90; }
+  if (seg.hasExclamation) { pitch *= 1.10; rate *= 1.05; }
+  if (seg.hasQuestion) { pitch *= 1.08; }
+  if (seg.hasEllipsis) { rate *= 0.80; }
 
-  // Punctuation adjustments
-  if (seg.hasExclamation) {
-    pitch *= 1.10;
-    rate *= 1.05;
-  }
-  if (seg.hasQuestion) {
-    pitch *= 1.08;
-  }
-  if (seg.hasEllipsis) {
-    rate *= 0.80;
-  }
-
-  // Clamp to Web Speech API limits
   pitch = Math.max(0.1, Math.min(2.0, pitch));
   rate = Math.max(0.1, Math.min(10.0, rate));
 
@@ -238,48 +254,39 @@ function getVoiceParams(
 
 export default function TextToSpeech({
   text,
-  label = "読み上げ",
+  label,
   mode = "emotional",
   compact = false,
   stage = null,
+  locale = "ja",
 }: TextToSpeechProps) {
+  const dict = getDictionary(locale);
+  const defaultLabel = label ?? dict.tts.readAloud;
+
   const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
   const [rate, setRate] = useState(1.0);
   const [showControls, setShowControls] = useState(false);
   const [voiceReady, setVoiceReady] = useState(false);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-  const utterancesRef = useRef<SpeechSynthesisUtterance[]>([]);
   const currentIndexRef = useRef(0);
   const rateRef = useRef(rate);
 
-  // Keep rate ref in sync
-  useEffect(() => {
-    rateRef.current = rate;
-  }, [rate]);
+  useEffect(() => { rateRef.current = rate; }, [rate]);
 
-  // Load voices
   useEffect(() => {
     const loadVoices = () => {
       const voices = speechSynthesis.getVoices();
       if (voices.length > 0) {
-        voiceRef.current = findBestJapaneseVoice(voices);
+        voiceRef.current = findBestVoice(voices, locale);
         setVoiceReady(true);
       }
     };
-
     loadVoices();
     speechSynthesis.addEventListener("voiceschanged", loadVoices);
-    return () => {
-      speechSynthesis.removeEventListener("voiceschanged", loadVoices);
-    };
-  }, []);
+    return () => { speechSynthesis.removeEventListener("voiceschanged", loadVoices); };
+  }, [locale]);
 
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      speechSynthesis.cancel();
-    };
-  }, []);
+  useEffect(() => { return () => { speechSynthesis.cancel(); }; }, []);
 
   const speakSegment = useCallback(
     (segments: Segment[], index: number) => {
@@ -293,10 +300,8 @@ export default function TextToSpeech({
       const seg = segments[index];
       const utterance = new SpeechSynthesisUtterance(seg.text);
 
-      if (voiceRef.current) {
-        utterance.voice = voiceRef.current;
-      }
-      utterance.lang = "ja-JP";
+      if (voiceRef.current) utterance.voice = voiceRef.current;
+      utterance.lang = locale === "en" ? "en-US" : "ja-JP";
 
       if (mode === "emotional") {
         const params = getVoiceParams(seg, stage, rateRef.current);
@@ -309,8 +314,6 @@ export default function TextToSpeech({
 
       utterance.onend = () => {
         currentIndexRef.current = index + 1;
-        // Add pauses between segments for natural breathing
-        // Long dash (——) gets a dramatic pause, ellipsis also long
         const pauseMs = seg.hasDash ? 700 : seg.hasEllipsis ? 600 : 100;
         setTimeout(() => speakSegment(segments, index + 1), pauseMs);
       };
@@ -323,31 +326,21 @@ export default function TextToSpeech({
 
       speechSynthesis.speak(utterance);
     },
-    [mode, stage]
+    [mode, stage, locale]
   );
 
   const handlePlay = useCallback(() => {
-    if (status === "paused") {
-      speechSynthesis.resume();
-      setStatus("playing");
-      return;
-    }
-
-    // Start fresh
+    if (status === "paused") { speechSynthesis.resume(); setStatus("playing"); return; }
     speechSynthesis.cancel();
-    const segments = splitIntoSegments(text);
+    const segments = splitIntoSegments(text, locale);
     if (segments.length === 0) return;
-
     currentIndexRef.current = 0;
     setStatus("playing");
     setShowControls(true);
     speakSegment(segments, 0);
-  }, [status, text, speakSegment]);
+  }, [status, text, speakSegment, locale]);
 
-  const handlePause = useCallback(() => {
-    speechSynthesis.pause();
-    setStatus("paused");
-  }, []);
+  const handlePause = useCallback(() => { speechSynthesis.pause(); setStatus("paused"); }, []);
 
   const handleStop = useCallback(() => {
     speechSynthesis.cancel();
@@ -359,24 +352,19 @@ export default function TextToSpeech({
   const handleRateChange = useCallback(
     (newRate: number) => {
       setRate(newRate);
-      // If currently playing, restart at current position with new rate
       if (status === "playing") {
         speechSynthesis.cancel();
-        const segments = splitIntoSegments(text);
+        const segments = splitIntoSegments(text, locale);
         speakSegment(segments, currentIndexRef.current);
       }
     },
-    [status, text, speakSegment]
+    [status, text, speakSegment, locale]
   );
 
-  // Don't render if speech synthesis not supported
-  if (typeof window !== "undefined" && !("speechSynthesis" in window)) {
-    return null;
-  }
+  if (typeof window !== "undefined" && !("speechSynthesis" in window)) return null;
 
   return (
     <div className="inline-flex items-center gap-2 flex-wrap">
-      {/* Main play button */}
       {status === "idle" ? (
         <button
           onClick={handlePlay}
@@ -386,31 +374,21 @@ export default function TextToSpeech({
               ? "h-8 w-8 justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20"
               : "px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm"
           } ${!voiceReady ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
-          title={label}
+          title={defaultLabel}
         >
-          {/* Play icon */}
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="text-accent shrink-0"
-          >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-accent shrink-0">
             <path d="M8 5v14l11-7z" />
           </svg>
           {!compact && (
-            <span className="text-muted group-hover:text-foreground transition-colors">
-              {label}
-            </span>
+            <span className="text-muted group-hover:text-foreground transition-colors">{defaultLabel}</span>
           )}
         </button>
       ) : (
         <div className="inline-flex items-center gap-1.5">
-          {/* Pause/Resume */}
           <button
             onClick={status === "playing" ? handlePause : handlePlay}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 hover:bg-accent/30 border border-accent/30 transition-all"
-            title={status === "playing" ? "一時停止" : "再開"}
+            title={status === "playing" ? dict.tts.pause : dict.tts.resume}
           >
             {status === "playing" ? (
               <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-accent">
@@ -423,21 +401,17 @@ export default function TextToSpeech({
               </svg>
             )}
           </button>
-
-          {/* Stop */}
           <button
             onClick={handleStop}
             className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-            title="停止"
+            title={dict.tts.stop}
           >
             <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-muted">
               <rect x="4" y="4" width="16" height="16" rx="2" />
             </svg>
           </button>
-
-          {/* Speaking indicator */}
           {status === "playing" && (
-            <div className="flex items-center gap-0.5 ml-1" aria-label="読み上げ中">
+            <div className="flex items-center gap-0.5 ml-1" aria-label={dict.tts.speaking}>
               <span className="tts-bar h-3 w-0.5 rounded-full bg-accent" style={{ animationDelay: "0ms" }} />
               <span className="tts-bar h-4 w-0.5 rounded-full bg-accent" style={{ animationDelay: "150ms" }} />
               <span className="tts-bar h-2 w-0.5 rounded-full bg-accent" style={{ animationDelay: "300ms" }} />
@@ -447,8 +421,6 @@ export default function TextToSpeech({
           )}
         </div>
       )}
-
-      {/* Speed control - show when controls are visible */}
       {showControls && (
         <div className="inline-flex items-center gap-1 ml-2">
           {[0.8, 1.0, 1.2, 1.5].map((r) => (
