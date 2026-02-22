@@ -5,6 +5,7 @@ import {
   getInjuriesByAthleteId,
 } from "@/lib/mock-data";
 import { notFound } from "next/navigation";
+import { QuoteNarrator, TestimonyNarrator, SectionNarrator } from "@/components/QuoteNarrator";
 
 export default async function AthleteProfilePage({
   params,
@@ -18,6 +19,14 @@ export default async function AthleteProfilePage({
   const quotes = getQuotesByAthleteId(athleteId);
   const testimoniesList = getTestimoniesByAthleteId(athleteId);
   const injuries = getInjuriesByAthleteId(athleteId);
+
+  // Build full injury text for section-level TTS
+  const injuryText = [
+    athlete.injury_detail,
+    ...injuries.map(
+      (inj) => `${inj.diagnosis}。${inj.description}。${inj.year_occurred}年、回復${inj.recovery_months}ヶ月`
+    ),
+  ].join("。\n");
 
   return (
     <div className="space-y-12">
@@ -59,7 +68,10 @@ export default async function AthleteProfilePage({
 
       {/* Injury */}
       <section className="glass-card rounded-xl p-6">
-        <h2 className="text-xs font-medium tracking-widest text-muted uppercase">負傷の詳細</h2>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">負傷の詳細</h2>
+          <SectionNarrator text={injuryText} label="怪我情報を読み上げ" />
+        </div>
         <p className="mt-4 text-sm font-medium text-accent leading-relaxed">
           {athlete.injury_detail}
         </p>
@@ -106,9 +118,12 @@ export default async function AthleteProfilePage({
                 className="glass-card rounded-lg p-4 border-l-2"
                 style={{ borderImage: "linear-gradient(to bottom, #ef4444, #f97316) 1" }}
               >
-                <p className="text-sm italic leading-relaxed">
-                  「{q.quote}」
-                </p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm italic leading-relaxed">
+                    「{q.quote}」
+                  </p>
+                  <QuoteNarrator quote={q.quote} context={q.context ?? undefined} />
+                </div>
                 {q.context && (
                   <footer className="mt-1 text-xs text-muted">
                     — {q.context}
@@ -130,9 +145,16 @@ export default async function AthleteProfilePage({
                 key={t.id}
                 className="glass-card rounded-lg p-4"
               >
-                <p className="text-sm italic leading-relaxed">
-                  「{t.quote}」
-                </p>
+                <div className="flex items-start justify-between gap-2">
+                  <p className="text-sm italic leading-relaxed">
+                    「{t.quote}」
+                  </p>
+                  <TestimonyNarrator
+                    quote={t.quote}
+                    speaker={t.speaker_name}
+                    role={t.speaker_role}
+                  />
+                </div>
                 <footer className="mt-2 text-xs text-muted">
                   — {t.speaker_name}（{t.speaker_role}）
                 </footer>

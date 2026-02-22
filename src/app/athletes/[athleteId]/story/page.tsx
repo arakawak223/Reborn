@@ -1,5 +1,6 @@
 import { getAthleteById, getStoryByAthleteId } from "@/lib/mock-data";
 import { notFound } from "next/navigation";
+import { ChapterNarrator, FullStoryNarrator } from "@/components/StoryNarrator";
 
 const STAGE_META: Record<string, { label: string; icon: string; colorClass: string; color: string }> = {
   origin: { label: "根源", icon: "01", colorClass: "stage-origin", color: "#f59e0b" },
@@ -22,12 +23,27 @@ export default async function StoryPage({
 
   return (
     <div>
-      <h2 className="text-xs font-medium tracking-widest text-muted uppercase">
-        復活の物語
-      </h2>
-      <p className="mt-2 text-sm text-muted">
-        5つの章で紐解く、{athlete.name}の復活劇
-      </p>
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <h2 className="text-xs font-medium tracking-widest text-muted uppercase">
+            復活の物語
+          </h2>
+          <p className="mt-2 text-sm text-muted">
+            5つの章で紐解く、{athlete.name}の復活劇
+          </p>
+        </div>
+        {/* Full story narration button */}
+        <FullStoryNarrator
+          chapters={chapters.map((ch) => ({
+            id: ch.id,
+            title: ch.title,
+            body: ch.body,
+            stage: ch.stage,
+            year_label: ch.year_label,
+          }))}
+          athleteName={athlete.name}
+        />
+      </div>
 
       <div className="mt-10 space-y-16">
         {chapters.map((chapter) => {
@@ -42,22 +58,34 @@ export default async function StoryPage({
               }}
             >
               {/* Chapter Header */}
-              <div className="flex items-baseline gap-4">
-                <span
-                  className="text-4xl font-bold"
-                  style={{ color: meta.color, opacity: 0.4 }}
-                >
-                  {meta.icon}
-                </span>
-                <div>
-                  <p className="text-xs font-medium tracking-widest text-muted uppercase">
-                    <span style={{ color: meta.color }}>{meta.label}</span>
-                    {chapter.year_label && (
-                      <span className="ml-2 normal-case">{chapter.year_label}</span>
-                    )}
-                  </p>
-                  <h3 className="mt-1 text-xl font-bold">{chapter.title}</h3>
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-baseline gap-4">
+                  <span
+                    className="text-4xl font-bold"
+                    style={{ color: meta.color, opacity: 0.4 }}
+                  >
+                    {meta.icon}
+                  </span>
+                  <div>
+                    <p className="text-xs font-medium tracking-widest text-muted uppercase">
+                      <span style={{ color: meta.color }}>{meta.label}</span>
+                      {chapter.year_label && (
+                        <span className="ml-2 normal-case">{chapter.year_label}</span>
+                      )}
+                    </p>
+                    <h3 className="mt-1 text-xl font-bold">{chapter.title}</h3>
+                  </div>
                 </div>
+                {/* Per-chapter narration */}
+                <ChapterNarrator
+                  chapter={{
+                    id: chapter.id,
+                    title: chapter.title,
+                    body: chapter.body,
+                    stage: chapter.stage,
+                    year_label: chapter.year_label,
+                  }}
+                />
               </div>
 
               {/* Chapter Body */}

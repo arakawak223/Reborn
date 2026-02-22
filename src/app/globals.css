@@ -203,6 +203,17 @@ body {
 }
 
 /* Stage colors for story */
+/* TTS speaking bars animation */
+@keyframes tts-eq {
+  0%, 100% { transform: scaleY(0.3); }
+  50% { transform: scaleY(1); }
+}
+
+.tts-bar {
+  animation: tts-eq 0.6s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
 .stage-origin { --stage-color: #f59e0b; }
 .stage-despair { --stage-color: #ef4444; }
 .stage-void { --stage-color: #6b7280; }
