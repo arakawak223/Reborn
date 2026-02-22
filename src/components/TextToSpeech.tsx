@@ -101,6 +101,7 @@ interface Segment {
   hasExclamation: boolean;
   hasQuestion: boolean;
   hasEllipsis: boolean;
+  hasDash: boolean;
 }
 
 function detectEmotion(text: string): Emotion {
@@ -116,9 +117,11 @@ function detectEmotion(text: string): Emotion {
   return best;
 }
 
+// Regex for long dashes: ——, ――, ーー, --, ─── etc. (2+ consecutive)
+const DASH_RE = /[—―─ー\-]{2,}/;
+
 /** Split text into sentence-level segments with emotion metadata */
 function splitIntoSegments(text: string): Segment[] {
-  // First split by paragraphs, then by sentences
   const paragraphs = text.split(/\n+/).filter((p) => p.trim());
   const segments: Segment[] = [];
 
@@ -126,24 +129,43 @@ function splitIntoSegments(text: string): Segment[] {
     const trimmed = para.trim();
     const isQuote = trimmed.startsWith("「") || trimmed.startsWith("『") || trimmed.startsWith("\"");
 
-    // Split paragraph into sentences (by 。！？ but keep the delimiter)
+    // Split paragraph into sentences (by 。！？…」』 but keep the delimiter)
     const sentences = trimmed
       .split(/(?<=[。！？…」』])/g)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
-    // If splitting produced nothing, use the whole paragraph
     const parts = sentences.length > 0 ? sentences : [trimmed];
 
     for (const sentence of parts) {
-      segments.push({
-        text: sentence,
-        isQuote,
-        emotion: detectEmotion(sentence),
-        hasExclamation: /！|!/.test(sentence),
-        hasQuestion: /？|\?/.test(sentence),
-        hasEllipsis: /…|\.\.\./.test(sentence),
-      });
+      // Further split on long dashes (——) to create a pause boundary
+      if (DASH_RE.test(sentence)) {
+        const subParts = sentence.split(DASH_RE).map((s) => s.trim()).filter((s) => s.length > 0);
+        subParts.forEach((sub, i) => {
+          // Strip any remaining stray single dashes at edges
+          const cleaned = sub.replace(/^[—―─ー\-]+|[—―─ー\-]+$/g, "").trim();
+          if (!cleaned) return;
+          segments.push({
+            text: cleaned,
+            isQuote,
+            emotion: detectEmotion(cleaned),
+            hasExclamation: /！|!/.test(cleaned),
+            hasQuestion: /？|\?/.test(cleaned),
+            hasEllipsis: /…|\.\.\./.test(cleaned),
+            hasDash: i < subParts.length - 1, // mark all but last sub-part
+          });
+        });
+      } else {
+        segments.push({
+          text: sentence,
+          isQuote,
+          emotion: detectEmotion(sentence),
+          hasExclamation: /！|!/.test(sentence),
+          hasQuestion: /？|\?/.test(sentence),
+          hasEllipsis: /…|\.\.\./.test(sentence),
+          hasDash: false,
+        });
+      }
     }
   }
 
@@ -286,8 +308,9 @@ export default function TextToSpeech({
 
       utterance.onend = () => {
         currentIndexRef.current = index + 1;
-        // Add a brief pause between segments for natural breathing
-        const pauseMs = seg.hasEllipsis ? 600 : seg.isQuote ? 400 : 150;
+        // Add pauses between segments for natural breathing
+        // Long dash (——) gets a dramatic pause, ellipsis also long
+        const pauseMs = seg.hasDash ? 700 : seg.hasEllipsis ? 600 : seg.isQuote ? 400 : 150;
         setTimeout(() => speakSegment(segments, index + 1), pauseMs);
       };
 
