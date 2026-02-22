@@ -129,9 +129,10 @@ function splitIntoSegments(text: string): Segment[] {
     const trimmed = para.trim();
     const isQuote = trimmed.startsWith("「") || trimmed.startsWith("『") || trimmed.startsWith("\"");
 
-    // Split paragraph into sentences (by 。！？…」』 but keep the delimiter)
+    // Split paragraph into sentences (by 。！？… but keep the delimiter)
+    // Note: 」』 are NOT split points — they should flow naturally
     const sentences = trimmed
-      .split(/(?<=[。！？…」』])/g)
+      .split(/(?<=[。！？…])/g)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
 
