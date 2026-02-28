@@ -1,0 +1,10 @@
+name = "coefont-proxy"
+main = "src/index.ts"
+compatibility_date = "2024-12-01"
+
+[vars]
+ALLOWED_ORIGIN = "*"
+
+# Secrets (set via `wrangler secret put`):
+# - COEFONT_ACCESS_KEY
+# - COEFONT_CLIENT_SECRET

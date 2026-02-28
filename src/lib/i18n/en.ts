@@ -41,6 +41,7 @@ const en: Dictionary = {
     achievements: "Achievements",
     injuryDetail: "Injury Details",
     readStory: "Read this story \u2192",
+    takeQuiz: "Take Quiz \u2192",
   },
 
   // Athletes list page
@@ -148,6 +149,7 @@ const en: Dictionary = {
     resume: "Resume",
     stop: "Stop",
     speaking: "Speaking",
+    loading: "Preparing audio...",
   },
 
   // BackButton

@@ -3,6 +3,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Locale } from "@/lib/locale-context";
 import { getDictionary } from "@/lib/i18n";
+import {
+  isCoefontAvailable,
+  fetchCoefontAudio,
+  convertPitch,
+  convertSpeed,
+  convertIntonation,
+  splitTextIntoChunks,
+  type CoefontParams,
+} from "@/lib/coefont-client";
+import { applyReadingDict } from "@/lib/coefont-dictionary";
 
 type TTSMode = "normal" | "emotional";
 type StoryStage = "origin" | "despair" | "void" | "awakening" | "rebirth" | null;
@@ -19,7 +29,7 @@ interface TextToSpeechProps {
 // Preferred Japanese voices
 const PREFERRED_JA_VOICES = [
   "Microsoft Nanami Online",
-  "Google \u65e5\u672c\u8a9e",
+  "Google 日本語",
   "Nanami",
   "Kyoko",
   "O-Ren",
@@ -56,38 +66,38 @@ const EMOTION_KEYWORDS_JA: { emotion: Emotion; words: string[] }[] = [
   {
     emotion: "sorrow",
     words: [
-      "\u7d76\u671b", "\u82e6\u75db", "\u6d99", "\u632b\u6298", "\u5d29\u308c", "\u5931", "\u60b2", "\u75db\u307f", "\u6697\u95c7",
-      "\u82e6\u3057", "\u6ce3", "\u5730\u7344", "\u6050\u6016", "\u4e0d\u5b89", "\u5b64\u72ec", "\u65ad\u88c2", "\u7834\u58ca", "\u7d42\u308f\u308a",
-      "\u3082\u3046\u99c4\u76ee", "\u5168\u6cbb", "\u624b\u8853", "\u5f15\u9000", "\u96e2\u8131", "\u91cd\u50b7",
+      "絶望", "苦痛", "涙", "挫折", "崩れ", "失", "悲", "痛み", "暗闇",
+      "苦し", "泣", "地獄", "恐怖", "不安", "孤独", "断裂", "破壊", "終わり",
+      "もう駄目", "全治", "手術", "引退", "離脱", "重傷",
     ],
   },
   {
     emotion: "triumph",
     words: [
-      "\u5fa9\u6d3b", "\u52dd\u5229", "\u6804\u5149", "\u5947\u8de1", "\u6b53\u559c", "\u9054\u6210", "\u512a\u52dd", "\u91d1\u30e1\u30c0\u30eb",
-      "\u5fa9\u5e30", "\u6210\u3057\u9042\u3052", "\u8d85\u3048", "\u6253\u3061\u52dd", "\u518d\u3073", "\u623b\u3063\u3066", "\u8f1d",
-      "\u6b53\u58f0", "\u4e16\u754c\u4e00", "\u8a18\u9332", "\u8a3c\u660e", "\u4fe1\u3058",
+      "復活", "勝利", "栄光", "奇跡", "歓喜", "達成", "優勝", "金メダル",
+      "復帰", "成し遂げ", "超え", "打ち勝", "再び", "戻って", "輝",
+      "歓声", "世界一", "記録", "証明", "信じ",
     ],
   },
   {
     emotion: "tension",
     words: [
-      "\u6c7a\u65ad", "\u899a\u609f", "\u904b\u547d", "\u8ced\u3051", "\u702c\u6238\u969b", "\u9650\u754c", "\u6311", "\u95d8",
-      "\u7acb\u3061\u4e0a\u304c", "\u5fc5\u6b7b", "\u547d\u304c\u3051", "\u30ae\u30ea\u30ae\u30ea", "\u6700\u5f8c\u306e", "\u4e00\u304b\u516b\u304b",
+      "決断", "覚悟", "運命", "賭け", "瀬戸際", "限界", "挑", "闘",
+      "立ち上が", "必死", "命がけ", "ギリギリ", "最後の", "一か八か",
     ],
   },
   {
     emotion: "quiet",
     words: [
-      "\u9759\u304b", "\u7a7a\u767d", "\u7121", "\u6c88\u9ed9", "\u305f\u3060", "\u4e00\u4eba", "\u3058\u3063\u3068", "\u9577\u3044",
-      "\u898b\u3064\u3081", "\u5f85", "\u8010\u3048", "\u65e5\u3005", "\u7e70\u308a\u8fd4",
+      "静か", "空白", "無", "沈黙", "ただ", "一人", "じっと", "長い",
+      "見つめ", "待", "耐え", "日々", "繰り返",
     ],
   },
   {
     emotion: "warm",
     words: [
-      "\u652f\u3048", "\u4ef2\u9593", "\u5bb6\u65cf", "\u611f\u8b1d", "\u611b", "\u7d46", "\u6069", "\u5171\u306b",
-      "\u5bc4\u308a\u6dfb", "\u52b1\u307e\u3057", "\u4fe1\u983c", "\u7b11\u9854",
+      "支え", "仲間", "家族", "感謝", "愛", "絆", "恩", "共に",
+      "寄り添", "励まし", "信頼", "笑顔",
     ],
   },
 ];
@@ -174,8 +184,8 @@ function splitIntoSegments(text: string, locale: Locale): Segment[] {
   for (const para of paragraphs) {
     const trimmed = para.trim();
     const isQuote = locale === "ja"
-      ? (trimmed.startsWith("\u300c") || trimmed.startsWith("\u300e") || trimmed.startsWith("\""))
-      : (trimmed.startsWith("\"") || trimmed.startsWith("\u201c") || trimmed.startsWith("\u300c"));
+      ? (trimmed.startsWith("「") || trimmed.startsWith("『") || trimmed.startsWith("\""))
+      : (trimmed.startsWith("\"") || trimmed.startsWith("\u201c") || trimmed.startsWith("「"));
 
     const sentenceRegex = locale === "en"
       ? /(?<=[.!?])\s+/g
@@ -252,6 +262,61 @@ function getVoiceParams(
   return { pitch, rate };
 }
 
+// ---------------------------------------------------------------------------
+// CoeFont helpers
+// ---------------------------------------------------------------------------
+
+/** Merge paragraphs into chunks for CoeFont, keeping each under 900 chars.
+ *  Newlines become "。" so CoeFont inserts a natural pause at paragraph boundaries. */
+function splitIntoParagraphChunks(text: string): string[] {
+  const paragraphs = text.split(/\n+/).map((p) => p.trim()).filter((p) => p.length > 0);
+  // Merge paragraphs into as few chunks as possible (max 900 chars each)
+  const chunks: string[] = [];
+  let current = "";
+  for (const para of paragraphs) {
+    const separator = current ? "。" : "";
+    if (current.length + separator.length + para.length <= 900) {
+      current += separator + para;
+    } else {
+      if (current) chunks.push(current);
+      if (para.length > 900) {
+        chunks.push(...splitTextIntoChunks(para, 900));
+        current = "";
+      } else {
+        current = para;
+      }
+    }
+  }
+  if (current) chunks.push(current);
+  return chunks.length > 0 ? chunks : [text];
+}
+
+function buildCoefontParamsForText(text: string, stage: StoryStage, baseRate: number, locale: Locale): CoefontParams {
+  const emotion = detectEmotion(text, locale);
+  const stageTone = stage && STAGE_TONE[stage] ? STAGE_TONE[stage] : { pitchBase: 1.0, rateBase: 1.0 };
+  let pitch = stageTone.pitchBase;
+  let rate = baseRate * stageTone.rateBase;
+
+  switch (emotion) {
+    case "sorrow":  pitch *= 0.95; rate *= 0.92; break;
+    case "triumph": pitch *= 1.06; rate *= 1.02; break;
+    case "tension": pitch *= 1.03; rate *= 0.95; break;
+    case "quiet":   pitch *= 0.97; rate *= 0.90; break;
+    case "warm":    pitch *= 1.03; rate *= 0.96; break;
+  }
+
+  return {
+    text: locale === "ja" ? applyReadingDict(text) : text,
+    pitch: convertPitch(pitch),
+    speed: convertSpeed(rate),
+    intonation: convertIntonation(emotion),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Component
+// ---------------------------------------------------------------------------
+
 export default function TextToSpeech({
   text,
   label,
@@ -263,13 +328,20 @@ export default function TextToSpeech({
   const dict = getDictionary(locale);
   const defaultLabel = label ?? dict.tts.readAloud;
 
-  const [status, setStatus] = useState<"idle" | "playing" | "paused">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "playing" | "paused">("idle");
   const [rate, setRate] = useState(1.0);
   const [showControls, setShowControls] = useState(false);
   const [voiceReady, setVoiceReady] = useState(false);
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const currentIndexRef = useRef(0);
   const rateRef = useRef(rate);
+
+  // CoeFont state
+  const useCoefont = locale === "ja" && isCoefontAvailable();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
+  const stoppedRef = useRef(false);
+  const prefetchRef = useRef<Promise<Blob | null> | null>(null);
 
   useEffect(() => { rateRef.current = rate; }, [rate]);
 
@@ -286,7 +358,104 @@ export default function TextToSpeech({
     return () => { speechSynthesis.removeEventListener("voiceschanged", loadVoices); };
   }, [locale]);
 
-  useEffect(() => { return () => { speechSynthesis.cancel(); }; }, []);
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      speechSynthesis.cancel();
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, []);
+
+  // Revoke previous blob URL helper
+  const revokeBlobUrl = useCallback(() => {
+    if (blobUrlRef.current) {
+      URL.revokeObjectURL(blobUrlRef.current);
+      blobUrlRef.current = null;
+    }
+  }, []);
+
+  // ---------------------------------------------------------------------------
+  // CoeFont playback
+  // ---------------------------------------------------------------------------
+
+  const speakChunksCoefont = useCallback(
+    async (chunks: string[], index: number, fallbackToWebSpeech: () => void) => {
+      if (stoppedRef.current || index >= chunks.length) {
+        if (!stoppedRef.current) {
+          setStatus("idle");
+          setShowControls(false);
+          currentIndexRef.current = 0;
+        }
+        return;
+      }
+
+      const chunkText = chunks[index];
+      const params = buildCoefontParamsForText(chunkText, stage, rateRef.current, locale);
+
+      // Use prefetched blob if available
+      let blob: Blob | null = null;
+      if (prefetchRef.current) {
+        blob = await prefetchRef.current;
+        prefetchRef.current = null;
+      }
+      if (!blob) {
+        blob = await fetchCoefontAudio(params);
+      }
+
+      if (!blob) {
+        console.warn("CoeFont failed, falling back to Web Speech API");
+        fallbackToWebSpeech();
+        return;
+      }
+
+      if (stoppedRef.current) return;
+
+      // Prefetch next chunk
+      if (index + 1 < chunks.length) {
+        const nextParams = buildCoefontParamsForText(chunks[index + 1], stage, rateRef.current, locale);
+        prefetchRef.current = fetchCoefontAudio(nextParams);
+      }
+
+      // Play audio
+      revokeBlobUrl();
+      const url = URL.createObjectURL(blob);
+      blobUrlRef.current = url;
+
+      await new Promise<void>((resolve, reject) => {
+        const audio = new Audio(url);
+        audioRef.current = audio;
+        audio.onended = () => resolve();
+        audio.onerror = () => reject(new Error("Audio playback error"));
+        audio.play().catch(reject);
+      }).catch(() => {
+        console.warn("CoeFont playback error, falling back to Web Speech API");
+        fallbackToWebSpeech();
+        return;
+      });
+
+      if (stoppedRef.current) return;
+
+      // Short pause between paragraphs
+      currentIndexRef.current = index + 1;
+      await new Promise((r) => setTimeout(r, 300));
+
+      if (!stoppedRef.current) {
+        speakChunksCoefont(chunks, index + 1, fallbackToWebSpeech);
+      }
+    },
+    [stage, locale, revokeBlobUrl],
+  );
+
+  // ---------------------------------------------------------------------------
+  // Web Speech API playback (for English, or CoeFont fallback)
+  // ---------------------------------------------------------------------------
 
   const speakSegment = useCallback(
     (segments: Segment[], index: number) => {
@@ -329,51 +498,136 @@ export default function TextToSpeech({
     [mode, stage, locale]
   );
 
-  const handlePlay = useCallback(() => {
-    if (status === "paused") { speechSynthesis.resume(); setStatus("playing"); return; }
-    speechSynthesis.cancel();
-    const segments = splitIntoSegments(text, locale);
-    if (segments.length === 0) return;
-    currentIndexRef.current = 0;
-    setStatus("playing");
-    setShowControls(true);
-    speakSegment(segments, 0);
-  }, [status, text, speakSegment, locale]);
+  // ---------------------------------------------------------------------------
+  // Handlers
+  // ---------------------------------------------------------------------------
 
-  const handlePause = useCallback(() => { speechSynthesis.pause(); setStatus("paused"); }, []);
+  const handlePlay = useCallback(() => {
+    if (status === "paused") {
+      if (useCoefont && audioRef.current) {
+        audioRef.current.play();
+        setStatus("playing");
+      } else {
+        speechSynthesis.resume();
+        setStatus("playing");
+      }
+      return;
+    }
+
+    // Stop any current playback
+    speechSynthesis.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    stoppedRef.current = false;
+
+    currentIndexRef.current = 0;
+
+    if (useCoefont) {
+      const chunks = splitIntoParagraphChunks(text);
+      if (chunks.length === 0) return;
+
+      setStatus("loading");
+      setShowControls(true);
+
+      const segments = splitIntoSegments(text, locale);
+      const fallbackToWebSpeech = () => {
+        stoppedRef.current = true;
+        revokeBlobUrl();
+        setStatus("playing");
+        speakSegment(segments, currentIndexRef.current);
+      };
+
+      speakChunksCoefont(chunks, 0, fallbackToWebSpeech);
+
+      const checkPlaying = () => {
+        if (audioRef.current && !stoppedRef.current) {
+          setStatus("playing");
+        }
+      };
+      setTimeout(checkPlaying, 200);
+    } else {
+      const segments = splitIntoSegments(text, locale);
+      if (segments.length === 0) return;
+      setStatus("playing");
+      setShowControls(true);
+      speakSegment(segments, 0);
+    }
+  }, [status, text, speakSegment, speakChunksCoefont, locale, useCoefont, revokeBlobUrl]);
+
+  const handlePause = useCallback(() => {
+    if (useCoefont && audioRef.current) {
+      audioRef.current.pause();
+    } else {
+      speechSynthesis.pause();
+    }
+    setStatus("paused");
+  }, [useCoefont]);
 
   const handleStop = useCallback(() => {
+    stoppedRef.current = true;
     speechSynthesis.cancel();
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    revokeBlobUrl();
+    prefetchRef.current = null;
     setStatus("idle");
     setShowControls(false);
     currentIndexRef.current = 0;
-  }, []);
+  }, [revokeBlobUrl]);
 
   const handleRateChange = useCallback(
     (newRate: number) => {
       setRate(newRate);
       if (status === "playing") {
-        speechSynthesis.cancel();
-        const segments = splitIntoSegments(text, locale);
-        speakSegment(segments, currentIndexRef.current);
+        if (useCoefont) {
+          handleStop();
+          setTimeout(() => {
+            stoppedRef.current = false;
+            const chunks = splitIntoParagraphChunks(text);
+            setStatus("loading");
+            setShowControls(true);
+            const segments = splitIntoSegments(text, locale);
+            const fallbackToWebSpeech = () => {
+              stoppedRef.current = true;
+              revokeBlobUrl();
+              setStatus("playing");
+              speakSegment(segments, currentIndexRef.current);
+            };
+            speakChunksCoefont(chunks, currentIndexRef.current, fallbackToWebSpeech);
+            setTimeout(() => {
+              if (audioRef.current && !stoppedRef.current) setStatus("playing");
+            }, 200);
+          }, 50);
+        } else {
+          speechSynthesis.cancel();
+          const segments = splitIntoSegments(text, locale);
+          speakSegment(segments, currentIndexRef.current);
+        }
       }
     },
-    [status, text, speakSegment, locale]
+    [status, text, speakSegment, speakChunksCoefont, locale, useCoefont, handleStop, revokeBlobUrl]
   );
 
-  if (typeof window !== "undefined" && !("speechSynthesis" in window)) return null;
+  if (typeof window !== "undefined" && !("speechSynthesis" in window) && !useCoefont) return null;
+
+  const isReady = useCoefont || voiceReady;
+  const loadingLabel = dict.tts.loading;
 
   return (
     <div className="inline-flex items-center gap-2 flex-wrap">
       {status === "idle" ? (
         <button
           onClick={handlePlay}
-          disabled={!voiceReady}
+          disabled={!isReady}
           className={`group inline-flex items-center gap-2 rounded-full transition-all duration-300 ${
             compact
               ? "h-8 w-8 justify-center bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20"
               : "px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-sm"
-          } ${!voiceReady ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
+          } ${!isReady ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
           title={defaultLabel}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-accent shrink-0">
@@ -383,6 +637,27 @@ export default function TextToSpeech({
             <span className="text-muted group-hover:text-foreground transition-colors">{defaultLabel}</span>
           )}
         </button>
+      ) : status === "loading" ? (
+        <div className="inline-flex items-center gap-2">
+          <div className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent/20 border border-accent/30">
+            <svg className="animate-spin h-4 w-4 text-accent" viewBox="0 0 24 24" fill="none">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+            </svg>
+          </div>
+          <button
+            onClick={handleStop}
+            className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+            title={dict.tts.stop}
+          >
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="text-muted">
+              <rect x="4" y="4" width="16" height="16" rx="2" />
+            </svg>
+          </button>
+          {!compact && (
+            <span className="text-xs text-muted">{loadingLabel}</span>
+          )}
+        </div>
       ) : (
         <div className="inline-flex items-center gap-1.5">
           <button

@@ -36,6 +36,7 @@ const ja = {
     achievements: "\u4e3b\u306a\u529f\u7e3e",
     injuryDetail: "\u8ca0\u50b7\u306e\u8a73\u7d30",
     readStory: "\u3053\u306e\u7269\u8a9e\u3092\u8aad\u3080 \u2192",
+    takeQuiz: "\u30af\u30a4\u30ba\u306b\u6311\u6226 \u2192",
   },
 
   // Athletes list page
@@ -142,6 +143,7 @@ const ja = {
     resume: "\u518d\u958b",
     stop: "\u505c\u6b62",
     speaking: "\u8aad\u307f\u4e0a\u3052\u4e2d",
+    loading: "\u97f3\u58f0\u3092\u6e96\u5099\u4e2d...",
   },
 
   // BackButton

@@ -4568,7 +4568,7 @@ export function getQuizById(id: string) {
 
 export function getQuizzesByAthleteId(id: string | null) {
   if (!id) return quizQuestions;
-  return quizQuestions.filter((q) => q.athlete_id === id || q.athlete_id === null);
+  return quizQuestions.filter((q) => q.athlete_id === id);
 }
 
 export function searchInjuries(bodyRegion?: string | null, injuryType?: string | null) {
