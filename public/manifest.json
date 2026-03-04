@@ -1,0 +1,28 @@
+{
+  "name": "RE:BORN — 復活アスリート図鑑",
+  "short_name": "RE:BORN",
+  "description": "The Comeback Athlete Archive",
+  "start_url": "/Reborn/ja",
+  "scope": "/Reborn/",
+  "display": "standalone",
+  "background_color": "#05050a",
+  "theme_color": "#05050a",
+  "icons": [
+    {
+      "src": "/Reborn/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/Reborn/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/Reborn/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
