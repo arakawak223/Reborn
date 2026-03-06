@@ -24,7 +24,7 @@ const ATHLETE_IDS = [
   "kimura", "sanibrawn", "ito", "toratani", "durant",
   "takahashi_ran", "leitch", "irie", "kasai", "tanaka",
   "ishikawa", "yamamoto", "fukuhara", "inoue", "kunieda_v2",
-  "kimura_v2", "tani", "murata", "watanabe", "akiyama",
+  "tani", "murata", "watanabe", "akiyama",
   "uchimura", "tomita", "sato_mami", "zanardi", "eriksen",
   "yamasaki", "hanyu", "endo", "ueno", "nishikori",
 ];

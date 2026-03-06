@@ -156,37 +156,6 @@ export const storyChaptersPart3: StoryChapter[] = [
     body: "Sparked by his Tokyo Paralympic comeback, Kunieda reached even greater heights. In 2022, he won Wimbledon, completing the career Golden Slam -- victories at all four Grand Slam tournaments. It was an achievement eternally engraved in the history of wheelchair tennis.\n\nFifty Grand Slam singles titles in total. That number is nothing less than proof of dominant supremacy in the sport of tennis.\n\nIn 2023, Kunieda announced his retirement from competitive play. He was awarded the People's Honor Award and hailed as a national treasure of Japanese sport.\n\n\"The wheelchair is my 'legs.' How I ride it is my tennis\" -- he lost the use of his lower body at nine, suffered the yips after elbow surgery, and still stood atop the world. Shingo Kunieda's story is the most beautiful proof that human potential has no limits.",
     year_label: "2022–2023",
   },
-  // --- Kimura v2 ---
-  {
-    id: "sc-126", athlete_id: "kimura_v2", order: 1, stage: "origin",
-    title: "A Life Measured by His Own Yardstick",
-    body: "Shiga Prefecture. Keiichi Kimura lost his sight at age two. Raised by a mother whose policy was to \"let him try everything,\" he found swimming. Because he could not see, his feel for the water was honed to an extraordinary sharpness. In the pool, his unique body awareness -- one that relied on no visual input -- became his weapon.\n\nFrom his Paralympic debut at the 2008 Beijing Games onward, Kimura stood as the ace of Japanese para-swimming. Through London and then Rio, the medals he earned shone ever brighter -- yet the brightest of all, gold, remained beyond his reach.\n\n\"I want to measure happiness not by someone else's yardstick, but by my own\" -- he said those words, and yet the athlete in him hungered for gold. There was a void deep in his soul that silver and bronze could never fill.",
-    year_label: "1992–2016",
-  },
-  {
-    id: "sc-127", athlete_id: "kimura_v2", order: 2, stage: "despair",
-    title: "Four Medals in Rio, but Zero Golds",
-    body: "The 2016 Rio Paralympics. Kimura competed in four events and won multiple medals, including a silver and a bronze. Objectively, it was a hugely successful Games. But Kimura's spirit was on the verge of breaking.\n\n\"I didn't win gold\" -- that single fact eclipsed the shine of every other medal.\n\n\"When I finished with silver in Rio, it was the first time I truly felt: 'I don't want anything but gold.'\"\n\nAfter returning to Japan, a profound emptiness engulfed him. \"Have I reached my limit?\" \"Is the barrier of total blindness one I simply cannot overcome?\" The moment he began to doubt his own potential, Kimura found himself in the darkest place of his life.\n\nThose around him tried to console him: \"Just winning medals is wonderful.\" But those words only cornered him further. He did not want to become someone who settled for \"wonderful.\"",
-    year_label: "2016",
-  },
-  {
-    id: "sc-128", athlete_id: "kimura_v2", order: 3, stage: "void",
-    title: "Totally Blind, Alone Abroad -- A Wordless Fresh Start",
-    body: "In 2017, Keiichi Kimura made a decision that would change everything. He left the comfort of Japan and moved to America by himself. A 26-year-old, totally blind, unable to speak English, leaping alone into a foreign country.\n\nHe couldn't communicate. He couldn't navigate. Even ordering a meal was a struggle. A challenge that would daunt a sighted person, and Kimura -- without sight -- chose it willingly. It was not only about improving his swimming technique. It was a trial he imposed on himself: to stop running from his own weakness.\n\nAn American host family welcomed him warmly. Relationships that transcended the language barrier gradually expanded his world. Under a new coach, he rebuilt his stroke from scratch and overhauled his physical conditioning from the ground up.\n\n\"His American journey gave him something deeper than swim technique -- it gave him depth as a human being.\" (Japan national team coach)\n\nThere were lonely nights. But Kimura knew -- on the other side of this loneliness lay gold.",
-    year_label: "2017–2020",
-  },
-  {
-    id: "sc-129", athlete_id: "kimura_v2", order: 4, stage: "awakening",
-    title: "Tokyo Paralympics -- The Long-Awaited Gold, Jubilation in the Water",
-    body: "The 2021 Tokyo Paralympics. The 100-meter butterfly final. Keiichi Kimura sliced through the water and touched the wall. But being totally blind, he had no idea where he had finished.\n\nHe asked the rival swimming in the next lane. The answer came back: \"Gold!\"\n\nIn that instant, Kimura collapsed in the water. Five years of anguish, the solitude of America, the day he swore to himself \"nothing but gold\" -- everything was redeemed in a single moment.\n\n\"I want to measure happiness not by someone else's yardstick, but by my own\" -- the gold medal was not someone else's yardstick. It was something he had sought from the very bottom of his heart. That is what made its weight irreplaceable.\n\nWhen the gold medal was placed around his neck on the podium, Kimura ran his fingertips over its cold metal surface and its heft. He could not see it. But it was undeniably there.",
-    year_label: "Summer 2021",
-  },
-  {
-    id: "sc-130", athlete_id: "kimura_v2", order: 5, stage: "rebirth",
-    title: "Back-to-Back Gold in Paris -- Brilliance from an Unseen World",
-    body: "The 2024 Paris Paralympics. Keiichi Kimura, now 35, won gold once more. Three years after his long-awaited triumph in Tokyo, he wrote a new chapter of history: consecutive gold medals.\n\nThe despair of \"zero golds\" in Rio. Solitary days in America. Elation in Tokyo. And certainty in Paris -- Kimura's swimming career has been a continuous cycle of setback and revival.\n\n\"His American journey gave him something deeper than swim technique -- it gave him depth as a human being.\" (Japan national team coach)\n\nA boy who lost his sight at two chose to measure happiness by his own yardstick and stood atop the world. Keiichi Kimura's story is a hymn to human possibility -- one that teaches us that \"not seeing\" deepens the capacity for \"feeling.\"",
-    year_label: "2024–",
-  },
   // --- Tani ---
   {
     id: "sc-131", athlete_id: "tani", order: 1, stage: "origin",

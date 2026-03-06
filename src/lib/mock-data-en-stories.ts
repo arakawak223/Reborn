@@ -314,32 +314,32 @@ export const storyChapters: StoryChapter[] = [
   // --- Kimura ---
   {
     id: "sc-051", athlete_id: "kimura", order: 1, stage: "origin",
-    title: "A Mother Who Said 'Try Everything' and a World Without Sight",
-    body: "Ritto City, Shiga Prefecture. Keiichi lost his sight at age two due to a congenital condition, but his mother insisted on a philosophy of \"let him try everything.\" He discovered swimming at four. The heightened aquatic senses that came from being unable to see eventually produced world-class performances.\n\nHe competed in four consecutive Paralympics. But gold remained the one medal that eluded him.",
-    year_label: "~2016",
+    title: "Measuring Life by His Own Yardstick",
+    body: "Shiga Prefecture. Keiichi Kimura lost his sight at age two. Under his mother's philosophy of \"let him try everything,\" he found swimming. Unable to rely on vision, he developed a unique body awareness in the water. In the pool, his inability to see became a weapon rather than a handicap.\n\nFrom his Paralympic debut at the 2008 Beijing Games, Kimura was the ace of Japanese para-swimming. With each successive Games -- London, Rio -- the color of his medals brightened, yet the most brilliant color of all, gold, remained beyond his grasp.\n\n\"I want to measure happiness by my own yardstick, not someone else's.\" Yet as an athlete, he hungered for gold. Silver and bronze could not fill the emptiness deep inside.",
+    year_label: "1992~2016",
   },
   {
     id: "sc-052", athlete_id: "kimura", order: 2, stage: "despair",
-    title: "The Despair of Rio -- Zero Gold Medals",
-    body: "The 2016 Rio Paralympics. He competed in four events and came away with silver and bronze. Yet gold remained out of reach. The final step felt eternally far.\n\nAfter returning to Japan, Kimura sank into a deep emptiness. \"Maybe I've reached my limit.\" He didn't want to use his blindness as an excuse -- but when results wouldn't come, his spirit nearly broke.",
+    title: "Four Medals in Rio, But Zero Gold",
+    body: "The 2016 Rio Paralympics. Kimura competed in four events, earning multiple medals including one silver and one bronze. Objectively, it was a hugely successful Games. But inside, he was breaking.\n\n\"I couldn't win gold.\" That single fact overshadowed the shine of every other medal.\n\n\"When I finished with silver in Rio, I truly felt for the first time, 'I want nothing but gold.'\"\n\nBack home, a deep emptiness engulfed him. \"Maybe I've hit my ceiling.\" \"Maybe the wall of total blindness can never be overcome after all.\" When he began doubting his own potential, Kimura was in the darkest place of his life.\n\nPeople around him consoled him: \"Just winning medals is wonderful.\" But those words only pushed him further down. He didn't want to be someone who settled for \"wonderful.\"",
     year_label: "2016",
   },
   {
     id: "sc-053", athlete_id: "kimura", order: 3, stage: "void",
-    title: "Alone to America -- A Wordless Reconstruction",
-    body: "In 2017, Kimura moved to America by himself. In a foreign land where he couldn't even speak the language, he was determined to rebuild from zero.\n\n\"The time when I couldn't win gold taught me the value of teammates.\"\n\nNew coaches, a new training environment, new rivals. The courage it takes for a blind person to plunge into unknown territory abroad is beyond what most can imagine. But Kimura had made up his mind: he would not run from his own weakness.",
+    title: "A Blind Man Alone in a Foreign Land -- A Wordless New Start",
+    body: "In 2017, Keiichi Kimura made a decision that changed everything. He left the comfort of Japan behind and moved to America alone. A 26-year-old, totally blind and unable to speak English, plunging into a foreign country by himself.\n\nHe couldn't communicate. He couldn't navigate the streets. Even ordering food was an ordeal. It would take courage for anyone; for someone without sight, it was extraordinary. But this wasn't just about improving his swimming technique -- it was a trial he imposed on himself to stop running from his own weakness.\n\nAn American host family welcomed him warmly. Relationships that transcended the language barrier gradually expanded his world. Under a new coach, he overhauled his stroke from scratch and rebuilt his physical foundation.\n\n\"His challenge in America gave him something deeper than swimming technique -- it gave him depth as a human being.\" (Japanese national team coach)\n\nThere were lonely nights. But Kimura knew: on the other side of this loneliness lay gold.",
     year_label: "2017~2020",
   },
   {
     id: "sc-054", athlete_id: "kimura", order: 4, stage: "awakening",
-    title: "Tokyo Paralympics -- The Long-Awaited Gold Medal",
-    body: "The 2021 Tokyo Paralympics, 100m butterfly. Keiichi Kimura finally touched the wall for gold. The moment he finished, he asked the swimmer in the next lane for the result. \"It's gold!\" At those words, Kimura collapsed in the water.\n\n\"Because I can't see, my other senses are sharpened. That's my privilege and mine alone.\"\n\nStanding atop the world as a totally blind athlete. His tears dissolved into the water.",
+    title: "Tokyo Paralympics -- The Long-Awaited Gold, Rejoicing in the Water",
+    body: "The 2021 Tokyo Paralympics. The 100m butterfly final. Keiichi Kimura sliced through the water and touched the wall. But being totally blind, he had no idea what place he'd finished.\n\nHe asked the swimmer in the adjacent lane. The answer came back: \"It's gold!\"\n\nIn that instant, Kimura collapsed in the water. Five years of anguish, the loneliness of America, the day he swore to himself \"nothing but gold\" -- all of it was redeemed.\n\n\"I want to measure happiness by my own yardstick, not someone else's.\" Gold was not someone else's yardstick. It was what he himself had craved from the depths of his soul. That's why its weight was irreplaceable.\n\nWhen the gold medal was placed around his neck on the podium, Kimura traced its coldness and weight with his fingertips. He couldn't see it. But it was undeniably there.",
     year_label: "Summer 2021",
   },
   {
     id: "sc-055", athlete_id: "kimura", order: 5, stage: "rebirth",
-    title: "Paris Gold Again -- The Strongest Swimmer in the Unseen World",
-    body: "The 2024 Paris Paralympics. At 34, Kimura won gold again. From long-awaited first gold to back-to-back champion.\n\n\"His strength comes from never looking away from his own weaknesses.\" (American coach)\n\nHe lost his sight at two, was crushed in Rio, rebuilt himself in America, and seized gold in both Tokyo and Paris. Keiichi Kimura's story is proof that \"not seeing\" can sharpen every other sense many times over -- a testament to human potential.",
+    title: "Gold Again in Paris -- Brilliance from the Unseen World",
+    body: "The 2024 Paris Paralympics. At 35, Keiichi Kimura won gold once more. Three years after fulfilling a lifelong dream in Tokyo, he now inscribed a new chapter: back-to-back champion.\n\nThe despair of \"zero gold\" in Rio. Lonely days in America. The ecstasy of Tokyo. The conviction of Paris. Kimura's swimming life has been a ceaseless cycle of setback and resurrection.\n\n\"His challenge in America gave him something deeper than swimming technique -- it gave him depth as a human being.\" (Japanese national team coach)\n\nThe boy who lost his sight at two chose to measure happiness by his own yardstick, and he stood atop the world. Keiichi Kimura's story is a hymn to human potential -- proof that \"not seeing\" can teach the depth of \"feeling.\"",
     year_label: "2024~",
   },
   // --- Sanibrawn ---
@@ -775,37 +775,6 @@ export const storyChapters: StoryChapter[] = [
     title: "Career Golden Slam and Ascension into Legend",
     body: "Sparked by his Tokyo Paralympic comeback, Kunieda reached even higher. In 2022, he won Wimbledon, completing a career Golden Slam -- victories at all four Grand Slams. An achievement etched forever in the history of wheelchair tennis.\n\nFifty Grand Slam singles titles. That number is nothing less than proof of absolute dominance in the sport of tennis.\n\nIn 2023, Kunieda announced his retirement from competition. He received the People's Honor Award, celebrated as one of Japan's greatest sporting treasures.\n\n\"The wheelchair is my 'legs.' How I master it defines my tennis.\" He lost the use of his lower body at nine. He fell into the yips after elbow surgery. And yet he stood atop the world again and again. Shingo Kunieda's story is the most beautiful proof that human potential knows no bounds.",
     year_label: "2022~2023",
-  },
-  // --- Kimura v2 ---
-  {
-    id: "sc-126", athlete_id: "kimura_v2", order: 1, stage: "origin",
-    title: "Measuring Life by His Own Yardstick",
-    body: "Shiga Prefecture. Keiichi Kimura lost his sight at age two. Under his mother's philosophy of \"let him try everything,\" he found swimming. Unable to rely on vision, he developed a unique body awareness in the water. In the pool, his inability to see became a weapon rather than a handicap.\n\nFrom his Paralympic debut at the 2008 Beijing Games, Kimura was the ace of Japanese para-swimming. With each successive Games -- London, Rio -- the color of his medals brightened, yet the most brilliant color of all, gold, remained beyond his grasp.\n\n\"I want to measure happiness by my own yardstick, not someone else's.\" Yet as an athlete, he hungered for gold. Silver and bronze could not fill the emptiness deep inside.",
-    year_label: "1992~2016",
-  },
-  {
-    id: "sc-127", athlete_id: "kimura_v2", order: 2, stage: "despair",
-    title: "Four Medals in Rio, But Zero Gold",
-    body: "The 2016 Rio Paralympics. Kimura competed in four events, earning multiple medals including one silver and one bronze. Objectively, it was a hugely successful Games. But inside, he was breaking.\n\n\"I couldn't win gold.\" That single fact overshadowed the shine of every other medal.\n\n\"When I finished with silver in Rio, I truly felt for the first time, 'I want nothing but gold.'\"\n\nBack home, a deep emptiness engulfed him. \"Maybe I've hit my ceiling.\" \"Maybe the wall of total blindness can never be overcome after all.\" When he began doubting his own potential, Kimura was in the darkest place of his life.\n\nPeople around him consoled him: \"Just winning medals is wonderful.\" But those words only pushed him further down. He didn't want to be someone who settled for \"wonderful.\"",
-    year_label: "2016",
-  },
-  {
-    id: "sc-128", athlete_id: "kimura_v2", order: 3, stage: "void",
-    title: "A Blind Man Alone in a Foreign Land -- A Wordless New Start",
-    body: "In 2017, Keiichi Kimura made a decision that changed everything. He left the comfort of Japan behind and moved to America alone. A 26-year-old, totally blind and unable to speak English, plunging into a foreign country by himself.\n\nHe couldn't communicate. He couldn't navigate the streets. Even ordering food was an ordeal. It would take courage for anyone; for someone without sight, it was extraordinary. But this wasn't just about improving his swimming technique -- it was a trial he imposed on himself to stop running from his own weakness.\n\nAn American host family welcomed him warmly. Relationships that transcended the language barrier gradually expanded his world. Under a new coach, he overhauled his stroke from scratch and rebuilt his physical foundation.\n\n\"His challenge in America gave him something deeper than swimming technique -- it gave him depth as a human being.\" (Japanese national team coach)\n\nThere were lonely nights. But Kimura knew: on the other side of this loneliness lay gold.",
-    year_label: "2017~2020",
-  },
-  {
-    id: "sc-129", athlete_id: "kimura_v2", order: 4, stage: "awakening",
-    title: "Tokyo Paralympics -- The Long-Awaited Gold, Rejoicing in the Water",
-    body: "The 2021 Tokyo Paralympics. The 100m butterfly final. Keiichi Kimura sliced through the water and touched the wall. But being totally blind, he had no idea what place he'd finished.\n\nHe asked the swimmer in the adjacent lane. The answer came back: \"It's gold!\"\n\nIn that instant, Kimura collapsed in the water. Five years of anguish, the loneliness of America, the day he swore to himself \"nothing but gold\" -- all of it was redeemed.\n\n\"I want to measure happiness by my own yardstick, not someone else's.\" Gold was not someone else's yardstick. It was what he himself had craved from the depths of his soul. That's why its weight was irreplaceable.\n\nWhen the gold medal was placed around his neck on the podium, Kimura traced its coldness and weight with his fingertips. He couldn't see it. But it was undeniably there.",
-    year_label: "Summer 2021",
-  },
-  {
-    id: "sc-130", athlete_id: "kimura_v2", order: 5, stage: "rebirth",
-    title: "Gold Again in Paris -- Brilliance from the Unseen World",
-    body: "The 2024 Paris Paralympics. At 35, Keiichi Kimura won gold once more. Three years after fulfilling a lifelong dream in Tokyo, he now inscribed a new chapter: back-to-back champion.\n\nThe despair of \"zero gold\" in Rio. Lonely days in America. The ecstasy of Tokyo. The conviction of Paris. Kimura's swimming life has been a ceaseless cycle of setback and resurrection.\n\n\"His challenge in America gave him something deeper than swimming technique -- it gave him depth as a human being.\" (Japanese national team coach)\n\nThe boy who lost his sight at two chose to measure happiness by his own yardstick, and he stood atop the world. Keiichi Kimura's story is a hymn to human potential -- proof that \"not seeing\" can teach the depth of \"feeling.\"",
-    year_label: "2024~",
   },
   // --- Tani ---
   {

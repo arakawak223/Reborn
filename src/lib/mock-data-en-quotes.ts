@@ -64,6 +64,8 @@ export const goldenQuotes: GoldenQuote[] = [
   // Kimura
   { id: "gq-021", athlete_id: "kimura", quote: "Because I can't see, my other senses are sharpened to a level others will never know. That's my privilege alone.", context: null },
   { id: "gq-022", athlete_id: "kimura", quote: "The years without a gold medal taught me the true value of the people around me.", context: "After the Rio Olympics" },
+  { id: "gq-051", athlete_id: "kimura", quote: "I want to measure happiness by my own yardstick, not anyone else's. Being blind is not a misfortune. What you feel and what you believe in — those are what give life its color.", context: null },
+  { id: "gq-052", athlete_id: "kimura", quote: "When I came away from Rio with silver, it was the first time I truly felt that anything less than gold meant nothing to me. Without that frustration, I never would have found the resolve to move to America.", context: "His determination after the Rio Paralympics" },
   // Sanibrawn
   { id: "gq-023", athlete_id: "sanibrawn", quote: "The time I spent injured was a research period — a chance to have a deep conversation with my own body.", context: null },
   { id: "gq-024", athlete_id: "sanibrawn", quote: "There's no need to rush back. When I return at 100%, the results will follow.", context: null },
@@ -216,19 +218,6 @@ export const goldenQuotes: GoldenQuote[] = [
     athlete_id: "kunieda_v2",
     quote: "When injuries led to a losing streak, I got stronger by finally admitting my own weakness. Before I could shout 'I am the strongest,' I first had to accept the weakest parts of myself. That was true strength.",
     context: "Reflecting on his slump after right elbow surgery",
-  },
-  // Kimura v2
-  {
-    id: "gq-051",
-    athlete_id: "kimura_v2",
-    quote: "I want to measure happiness by my own yardstick, not anyone else's. Being blind is not a misfortune. What you feel and what you believe in — those are what give life its color.",
-    context: null,
-  },
-  {
-    id: "gq-052",
-    athlete_id: "kimura_v2",
-    quote: "When I came away from Rio with silver, it was the first time I truly felt that anything less than gold meant nothing to me. Without that frustration, I never would have found the resolve to move to America.",
-    context: "His determination after the Rio Paralympics",
   },
   // Tani
   {
@@ -575,6 +564,7 @@ export const testimonies: Testimony[] = [
   { id: "tm-009", athlete_id: "mitoma", speaker_name: "Club manager", speaker_role: "Manager", quote: "Even when he was injured, he grew more off the pitch than anyone else on it." },
   { id: "tm-010", athlete_id: "abe", speaker_name: "All Japan head coach", speaker_role: "Coach", quote: "His attacking judo only gets sharper with every setback." },
   { id: "tm-011", athlete_id: "kimura", speaker_name: "U.S. coach", speaker_role: "Coach", quote: "His strength lies in never looking away from his own weaknesses." },
+  { id: "tm-026", athlete_id: "kimura", speaker_name: "Japan national team coach", speaker_role: "Coach", quote: "His journey in America gave him depth as a human being, not just as a swimmer. The courage to move alone to a country where he's totally blind and doesn't speak the language — that multiplied the weight of his gold medal many times over." },
   { id: "tm-012", athlete_id: "sanibrawn", speaker_name: "U.S. coach", speaker_role: "Coach", quote: "After the injury, he came back a smarter, stronger athlete than he was before." },
   { id: "tm-013", athlete_id: "ito", speaker_name: "National team coach", speaker_role: "Coach", quote: "Her creativity deepened even further after she experienced adversity." },
   { id: "tm-014", athlete_id: "toratani", speaker_name: "Fencing official", speaker_role: "Official", quote: "The tip of her blade carries an edge that only someone who has overcome true despair can possess." },
@@ -655,13 +645,6 @@ export const testimonies: Testimony[] = [
     speaker_name: "An international rival",
     speaker_role: "Player",
     quote: "He died once and came back to life. Now he's more unstoppable than ever. After his right elbow surgery, his backhand evolved even further.",
-  },
-  {
-    id: "tm-026",
-    athlete_id: "kimura_v2",
-    speaker_name: "Japan national team coach",
-    speaker_role: "Coach",
-    quote: "His journey in America gave him depth as a human being, not just as a swimmer. The courage to move alone to a country where he's totally blind and doesn't speak the language — that multiplied the weight of his gold medal many times over.",
   },
   {
     id: "tm-027",

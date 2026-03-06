@@ -37,7 +37,7 @@ export const athleteInjuries: InjuryRecord[] = [
   // Abe
   { id: "inj-023", athlete_id: "abe", body_region: "hand_right", injury_type: "other", diagnosis: "Finger deformity and injury", severity: 5, recovery_months: 3, year_occurred: 2022, description: "Finger deformation and grip strength loss from repeated training", is_primary: true },
   // Kimura
-  { id: "inj-024", athlete_id: "kimura", body_region: "head", injury_type: "other", diagnosis: "Total blindness from congenital condition", severity: 10, recovery_months: 0, year_occurred: 1992, description: "Lost sight at age 2. Turned to para swimming", is_primary: true },
+  { id: "inj-024", athlete_id: "kimura", body_region: "head", injury_type: "other", diagnosis: "Loss of sight at age 2 (acquired, not congenital)", severity: 10, recovery_months: 0, year_occurred: 1992, description: "Lost sight at age 2. An acquired visual disability, not congenital. Turned to para swimming", is_primary: true },
   // Sanibrawn
   { id: "inj-025", athlete_id: "sanibrawn", body_region: "lower_back", injury_type: "fracture", diagnosis: "Lumbar spondylolysis", severity: 7, recovery_months: 8, year_occurred: 2020, description: "A devastating lower back injury for a sprinter", is_primary: true },
   { id: "inj-026", athlete_id: "sanibrawn", body_region: "thigh_right", injury_type: "tear", diagnosis: "Hamstring injury", severity: 6, recovery_months: 4, year_occurred: 2021, description: "A rear thigh injury compounding the lumbar spondylolysis", is_primary: true },
@@ -75,8 +75,6 @@ export const athleteInjuries: InjuryRecord[] = [
   // Kunieda v2
   { id: "inj-050", athlete_id: "kunieda_v2", body_region: "elbow_right", injury_type: "other", diagnosis: "Right elbow surgery (yips-like condition)", severity: 8, recovery_months: 12, year_occurred: 2016, description: "Right elbow surgery just before the Rio Olympics. Developed a yips-like condition from fear of pain", is_primary: true },
   { id: "inj-051", athlete_id: "kunieda_v2", body_region: "lower_back", injury_type: "other", diagnosis: "Spinal tumor (age 9)", severity: 10, recovery_months: 0, year_occurred: 1993, description: "Lost the use of his lower body at age 9", is_primary: true },
-  // Kimura v2
-  { id: "inj-052", athlete_id: "kimura_v2", body_region: "head", injury_type: "other", diagnosis: "Loss of sight (age 2)", severity: 10, recovery_months: 0, year_occurred: 1992, description: "Lost sight at age 2. An acquired visual disability, not congenital", is_primary: true },
   // Tani
   { id: "inj-053", athlete_id: "tani", body_region: "ankle_right", injury_type: "other", diagnosis: "Right foot amputation below the ankle (osteosarcoma)", severity: 10, recovery_months: 12, year_occurred: 2002, description: "Right foot amputated below the ankle due to osteosarcoma", is_primary: true },
   // Murata
@@ -461,6 +459,19 @@ export const quizQuestions: QuizQuestion[] = [
     rationale: "Being completely blind, Kimura couldn't see the results after touching the wall. He asked his rival Tomita in the next lane, and upon hearing 'It's gold!', he collapsed in the water with emotion.",
     encouragement: "A rival who told him about his gold medal. A moment that captures the beauty of sports.",
   },
+  {
+    id: "quiz-040", athlete_id: "kimura", quiz_type: "serious", difficulty: 3,
+    question_text: "From the perspective of 'his own measuring stick,' what is the most essential action Keiichi Kimura took to recover from his post-Rio Olympics setback?",
+    choices: [
+      "He searched for the best coach in Japan",
+      "He let go of his obsession with medals and focused on enjoying himself",
+      "Despite being completely blind and unable to speak English, he moved to America alone, choosing a trial to 'not run from his weak self'",
+      "He retired and explored other paths",
+    ],
+    correct_index: 2,
+    rationale: "Kimura, who lives by 'his own measuring stick' rather than 'others' measuring sticks,' chose to move to America to confront his own weaknesses. By abandoning a comfortable environment and deliberately placing himself in a difficult situation, he gained depth as a human being.",
+    encouragement: "The courage to face your weakness without running away -- that may be the starting point of true strength.",
+  },
   // Sanibrawn
   {
     id: "quiz-023",
@@ -712,23 +723,6 @@ export const quizQuestions: QuizQuestion[] = [
     correct_index: 2,
     rationale: "The champion who had always proclaimed 'I am the strongest' acknowledged his weakness for the very first time -- and that was the first step toward true strength. By accepting his weakness, he rebuilt his backhand from scratch and worked with a mental coach to reconstruct his mind, technique, and body.",
     encouragement: "Acknowledging weakness is not defeat; it's the entrance to becoming a stronger self.",
-  },
-  // Kimura v2
-  {
-    id: "quiz-040",
-    athlete_id: "kimura_v2",
-    quiz_type: "serious",
-    difficulty: 3,
-    question_text: "From the perspective of 'his own measuring stick,' what is the most essential action Keiichi Kimura took to recover from his post-Rio Olympics setback?",
-    choices: [
-      "He searched for the best coach in Japan",
-      "He let go of his obsession with medals and focused on enjoying himself",
-      "Despite being completely blind and unable to speak English, he moved to America alone, choosing a trial to 'not run from his weak self'",
-      "He retired and explored other paths",
-    ],
-    correct_index: 2,
-    rationale: "Kimura, who lives by 'his own measuring stick' rather than 'others' measuring sticks,' chose to move to America to confront his own weaknesses. By abandoning a comfortable environment and deliberately placing himself in a difficult situation, he gained depth as a human being.",
-    encouragement: "The courage to face your weakness without running away -- that may be the starting point of true strength.",
   },
   // Tani
   {
