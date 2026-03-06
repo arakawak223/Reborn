@@ -11,6 +11,7 @@ const ja = {
     subtitle: "\u5fa9\u6d3b\u30a2\u30b9\u30ea\u30fc\u30c8\u56f3\u9451 \u2014 \u9b42\u306e\u30a2\u30fc\u30ab\u30a4\u30d6",
     athletes: "\u9078\u624b\u4e00\u89a7",
     explore: "\u63a2\u7d22",
+    bySport: "\u7af6\u6280\u5225",
   },
 
   // Footer
@@ -200,6 +201,25 @@ const ja = {
     jaw: "\u984e",
     eye_left: "\u5de6\u773c",
     eye_right: "\u53f3\u773c",
+  },
+
+  // Sport Index page
+  sportIndex: {
+    title: "\u7af6\u6280\u5225\u30a4\u30f3\u30c7\u30c3\u30af\u30b9",
+    subtitle: "\u30b9\u30dd\u30fc\u30c4\u7a2e\u985e\u304b\u3089\u30a2\u30b9\u30ea\u30fc\u30c8\u3092\u63a2\u3059",
+    injuryLabel: "\u8ca0\u50b7",
+    viewProfile: "\u30d7\u30ed\u30d5\u30a3\u30fc\u30eb\u3092\u898b\u308b \u2192",
+    athleteCount: "{n}\u4eba\u306e\u30a2\u30b9\u30ea\u30fc\u30c8",
+    categories: {
+      winter: "\u30a6\u30a3\u30f3\u30bf\u30fc\u30b9\u30dd\u30fc\u30c4",
+      ball: "\u7403\u6280",
+      racket: "\u30e9\u30b1\u30c3\u30c8\u7af6\u6280",
+      combat: "\u683c\u95d8\u6280",
+      swimming: "\u6c34\u6cf3",
+      track: "\u9678\u4e0a\u30fb\u30de\u30e9\u30bd\u30f3",
+      gymnastics: "\u4f53\u64cd",
+      other: "\u305d\u306e\u4ed6",
+    },
   },
 };
 

@@ -25,6 +25,12 @@ export function Header({ locale }: { locale: Locale }) {
             {dict.header.athletes}
           </Link>
           <Link
+            href={`/${locale}/sports`}
+            className="text-sm font-medium text-muted hover:text-foreground transition-colors"
+          >
+            {dict.header.bySport}
+          </Link>
+          <Link
             href={`/${locale}/explore`}
             className="text-sm font-medium text-muted hover:text-foreground transition-colors"
           >

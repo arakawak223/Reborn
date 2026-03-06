@@ -13,6 +13,7 @@ const en: Dictionary = {
     subtitle: "The Comeback Athlete Archive",
     athletes: "Athletes",
     explore: "Explore",
+    bySport: "By Sport",
   },
 
   // Footer
@@ -206,6 +207,25 @@ const en: Dictionary = {
     jaw: "Jaw",
     eye_left: "Left Eye",
     eye_right: "Right Eye",
+  },
+
+  // Sport Index page
+  sportIndex: {
+    title: "Sports Index",
+    subtitle: "Find athletes by sport",
+    injuryLabel: "Injury",
+    viewProfile: "View Profile \u2192",
+    athleteCount: "{n} athletes",
+    categories: {
+      winter: "Winter Sports",
+      ball: "Ball Sports",
+      racket: "Racket Sports",
+      combat: "Combat Sports",
+      swimming: "Swimming",
+      track: "Track & Marathon",
+      gymnastics: "Gymnastics",
+      other: "Other",
+    },
   },
 } as const;
 
